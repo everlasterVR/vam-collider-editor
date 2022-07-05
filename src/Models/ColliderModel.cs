@@ -32,7 +32,6 @@ public abstract class ColliderModel<T> : ColliderModel where T : Collider
 public abstract class ColliderModel : ModelBase<Collider>, IModel
 {
     private readonly ColliderPreviewConfig _config;
-    private bool _highlighted;
 
     public string Type => "Collider";
     public Collider Collider { get; set; }
@@ -53,7 +52,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
             var previewRenderer = Preview.GetComponent<Renderer>();
             var material = previewRenderer.material;
 
-            if (!_highlighted)
+            if (!Highlighted)
             {
                 var color = material.color;
                 color.a = _config.PreviewsOpacity;
@@ -105,7 +104,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
             var previewRenderer = XRayPreview.GetComponent<Renderer>();
             var material = previewRenderer.material;
 
-            if (!_highlighted)
+            if (!Highlighted)
             {
                 var color = previewRenderer.material.color;
                 color.a = _config.RelativeXRayOpacity * _config.PreviewsOpacity;
@@ -192,11 +191,11 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     protected abstract GameObject DoCreatePreview();
 
-    public virtual void SetHighlighted(bool value)
+    public void SetHighlighted(bool value)
     {
-        if (_highlighted == value) return;
+        if (Highlighted == value) return;
 
-        _highlighted = value;
+        Highlighted = value;
         RefreshHighlightedPreview();
         RefreshHighlightedXRayPreview();
     }
@@ -207,7 +206,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         {
             var previewRenderer = Preview.GetComponent<Renderer>();
             var color = previewRenderer.material.color;
-            color.a = _highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
+            color.a = Highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
             previewRenderer.material.color = color;
         }
     }
@@ -218,7 +217,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         {
             var previewRenderer = XRayPreview.GetComponent<Renderer>();
             var color = previewRenderer.material.color;
-            float alpha = _highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
+            float alpha = Highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
             color.a = _config.RelativeXRayOpacity * alpha;
             previewRenderer.material.color = color;
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class ModelBase<T> where T : Component
 {
+    private bool _highlighted;
     protected readonly T Component;
     public List<Group> Groups { get; set; }
     public ModelBase<T> Mirror { get; set; }
@@ -11,7 +12,6 @@ public abstract class ModelBase<T> where T : Component
     public string Id { get; }
     public string Label { get; }
     public bool Selected { get; set; }
-    public bool Highlighted { get; set; }
 
     protected ModelBase(T component, string label)
     {
@@ -21,6 +21,23 @@ public abstract class ModelBase<T> where T : Component
         Groups = new List<Group>();
         Id = component.Uuid();
         Label = label;
+    }
+
+    public bool Highlighted
+    {
+        get { return _highlighted; }
+        set
+        {
+            if (_highlighted != value)
+            {
+                SetHighlighted(value);
+                _highlighted = value;
+            }
+        }
+    }
+
+    public virtual void SetHighlighted(bool value)
+    {
     }
 
     public abstract void SyncPreviews();

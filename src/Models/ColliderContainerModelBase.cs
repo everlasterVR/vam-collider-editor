@@ -30,7 +30,7 @@ public abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Com
     {
     }
 
-    public virtual void SetHighlighted(bool value)
+    public override void SetHighlighted(bool value)
     {
         foreach (var collider in GetColliders())
             collider.SetHighlighted(value);

@@ -17,11 +17,14 @@ public class EditablesList
                     new Group("Right arm", @"^r(Shldr|ForeArm)"),
                     new Group("Right hand", @"^r(Index|Mid|Ring|Pinky|Thumb|Carpal|Hand)[0-9]?$"),
                     new Group("Chest", @"^(chest|(AutoCollider)?FemaleAutoColliderschest|MaleAutoColliderschest)"),
-                    new Group("Left breast", @"l((Pectoral)|Nipple)"),
-                    new Group("Right breast", @"r((Pectoral)|Nipple)"),
+                    new Group("Breasts", @"(Pectoral|Nipple)"),
+                    new Group("Left breast", @"l(Pectoral|Nipple)"),
+                    new Group("Right breast", @"r(Pectoral|Nipple)"),
                     new Group("Abdomen / Belly / Back", @"^((AutoCollider)?FemaleAutoColliders)?abdomen"),
                     new Group("Hip / Pelvis", @"^((Female)?AutoColliders?|MaleAutoColliders)?(hip|pelvis)"),
-                    new Group("Glute", @"^((AutoCollider)?FemaleAutoColliders)?[LR]Glute"),
+                    new Group("Glutes", @"^((AutoCollider)?FemaleAutoColliders)?[LR]Glute"),
+                    new Group("Left glute", @"^((AutoCollider)?FemaleAutoColliders)?LGlute"),
+                    new Group("Right glute", @"^((AutoCollider)?FemaleAutoColliders)?RGlute"),
                     new Group("Anus", @"^_JointA[rl]"),
                     new Group("Vagina", @"^_Joint(Gr|Gl|B)"),
                     new Group("Penis", @"^((AutoCollider)?Gen[1-3])|Testes"),
@@ -29,13 +32,13 @@ public class EditablesList
                     new Group("Left foot", @"^l(Foot|Toe|BigToe|SmallToe)"),
                     new Group("Right leg", @"^((AutoCollider)?(FemaleAutoColliders)?)?r(Thigh|Shin)"),
                     new Group("Right foot", @"^r(Foot|Toe|BigToe|SmallToe)"),
-                    new Group("Physics mesh joints", @"^PhysicsMeshJoint.+$"),
-                    new Group("Other", @"^.+$")
+                    new Group("Physics mesh joints", @"^PhysicsMeshJoint.+$")
                  }
                  : new List<Group>
                  {
                     new Group("All", @"^.+$"),
                  };
+        var other = new List<Group> { new Group("Other", "") };
 
         // AutoColliders
 
@@ -43,7 +46,10 @@ public class EditablesList
         var autoColliders = containingAtom.GetComponentsInChildren<AutoCollider>()
             .Select(autoCollider => new AutoColliderModel(script, autoCollider, config))
             .Where(model => { if (!autoColliderDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
-            .ForEach(model => model.Group = groups.FirstOrDefault(g => g.Test(model.AutoCollider.name)))
+            .ForEach(model => {
+                var matching = groups.Where(g => g.Test(model.AutoCollider.name));
+                model.Groups.AddRange(matching.Any() ? matching : other);
+            })
             .ToList();
 
         var autoCollidersRigidBodies = new HashSet<Rigidbody>(autoColliders.SelectMany(x => x.GetRigidbodies()));
@@ -62,7 +68,10 @@ public class EditablesList
                 return model;
             })
             .Where(model => { if (!autoColliderGroupDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
-            .ForEach(model => model.Group = groups.FirstOrDefault(g => g.Test(model.AutoColliderGroup.name)))
+            .ForEach(model => {
+                var matching = groups.Where(g => g.Test(model.AutoColliderGroup.name));
+                model.Groups.AddRange(matching.Any() ? matching : other);
+            })
             .ToList();
 
         // Rigidbodies
@@ -75,7 +84,10 @@ public class EditablesList
             .Where(rigidbody => IsRigidbodyIncluded(rigidbody))
             .Select(rigidbody => new RigidbodyModel(script, rigidbody))
             .Where(model => { if (!rigidbodyDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
-            .ForEach(model => model.Group = groups.FirstOrDefault(g => g.Test(model.Rigidbody.name)))
+            .ForEach(model => {
+                var matching = groups.Where(g => g.Test(model.Rigidbody.name));
+                model.Groups.AddRange(matching.Any() ? matching : other);
+            })
             .ToList();
         var rigidbodiesDict = rigidbodies.ToDictionary(x => x.Id);
 
@@ -102,17 +114,19 @@ public class EditablesList
                 {
                     colliderModel.RigidbodyModel = rigidbodyModel;
                     rigidbodyModel.Colliders.Add(colliderModel);
-                    colliderModel.Group = rigidbodyModel.Group;
+                    colliderModel.Groups = rigidbodyModel.Groups;
                 }
                 else
                 {
                     SuperController.LogError($"Could not find a matching rigidbody for collider '{colliderModel.Id}', rigidbody '{colliderModel.Collider.attachedRigidbody.Uuid()}'.");
-                    colliderModel.Group = groups.FirstOrDefault(g => g.Test(colliderModel.Collider.name));
+                    var matching = groups.Where(g => g.Test(colliderModel.Collider.name));
+                    colliderModel.Groups.AddRange(matching.Any() ? matching : other);
                 }
             }
             else
             {
-                colliderModel.Group = groups.FirstOrDefault(g => g.Test(colliderModel.Collider.name));
+                var matching = groups.Where(g => g.Test(colliderModel.Collider.name));
+                colliderModel.Groups.AddRange(matching.Any() ? matching : other);
             }
         }
 
@@ -122,7 +136,7 @@ public class EditablesList
         // All Editables
 
         return new EditablesList(
-            groups,
+            groups.Concat(other).ToList(),
             colliders,
             autoColliders,
             autoColliderGroups,

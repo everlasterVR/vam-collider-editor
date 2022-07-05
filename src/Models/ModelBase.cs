@@ -15,7 +15,7 @@ public abstract class ModelBase<T> where T : Component
     protected readonly MVRScript Script;
 
     public readonly T Component;
-    public Group Group { get; set; }
+    public List<Group> Groups { get; set; }
     public ModelBase<T> Mirror { get; set; }
     public IModel MirrorModel => Mirror as IModel;
     public bool SyncWithMirror { get; set; }
@@ -78,6 +78,7 @@ public abstract class ModelBase<T> where T : Component
 
         Script = script;
         Component = component;
+        Groups = new List<Group>();
         Id = component.Uuid();
         Label = label;
     }

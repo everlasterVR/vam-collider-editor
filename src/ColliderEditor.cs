@@ -367,14 +367,14 @@ public class ColliderEditor : MVRScript
 #endif
 
             if (_groupsJson.val != _allLabel && _groupsJson.val != _noSelectionLabel)
-                filtered = filtered.Where(e => e.Group?.Name == _groupsJson.val);
+                filtered = filtered.Where(e => e.Groups.Any(group => group?.Name == _groupsJson.val)).ToList();
 
             if (_typesJson.val != _allLabel && _typesJson.val != _noSelectionLabel)
                 filtered = filtered.Where(e => e.Type == _typesJson.val);
 
             if (_filterJson.val == Filters.ModifiedOnly)
                 filtered = filtered.Where(e => e.Modified);
-            else if (_filterJson.val == Filters.ModifiedOnly)
+            else if (_filterJson.val == Filters.NotModifiedOnly)
                 filtered = filtered.Where(e => !e.Modified);
 
 #if (!VAM_GT_1_20)

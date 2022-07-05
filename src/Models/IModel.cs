@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using SimpleJSON;
 
 public interface IModel
 {
     string Type { get; }
-    Group Group { get; }
+    List<Group> Groups { get; }
     string Id { get; }
     string Label { get; }
     bool Shown { get; set; }

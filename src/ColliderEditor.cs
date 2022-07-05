@@ -367,7 +367,7 @@ public class ColliderEditor : MVRScript
 #endif
 
             if (_groupsJson.val != _allLabel && _groupsJson.val != _noSelectionLabel)
-                filtered = filtered.Where(e => e.Group?.Name == _groupsJson.val);
+                filtered = filtered.Where(e => e.Groups.Any(group => group?.Name == _groupsJson.val)).ToList();
 
             if (_typesJson.val != _allLabel && _typesJson.val != _noSelectionLabel)
                 filtered = filtered.Where(e => e.Type == _typesJson.val);

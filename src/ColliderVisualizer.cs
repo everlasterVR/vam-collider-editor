@@ -24,6 +24,8 @@ public class ColliderVisualizer : MonoBehaviour
     public JSONStorableBool XRayPreviewsOffJSON { get; set; }
     public JSONStorableFloat PreviewOpacityJSON { get; set; }
     public JSONStorableFloat SelectedPreviewOpacityJSON { get; set; }
+    public JSONStorableFloat RelativeXRayOpacityJSON { get; set; }
+    public JSONStorableBool HighlightMirrorJSON { get; set; }
     public JSONStorableStringChooser GroupsJSON { get; set; }
     public JSONStorableStringChooser TypesJSON { get; set; }
     public JSONStorableStringChooser EditablesJSON { get; set; }
@@ -89,6 +91,21 @@ public class ColliderVisualizer : MonoBehaviour
                 _selectedMirror.UpdatePreviewsFromConfig();
         }, 0f, 1f);
 
+        RelativeXRayOpacityJSON = new JSONStorableFloat("relativeXRayOpacity", ColliderPreviewConfig.DefaultRelativeXRayOpacity, value =>
+        {
+            Config.RelativeXRayOpacity = value;
+            if (_selected != null)
+                _selected.UpdatePreviewsFromConfig();
+            if (_selectedMirror != null)
+                _selectedMirror.UpdatePreviewsFromConfig();
+        }, 0f, 1f);
+
+        HighlightMirrorJSON = new JSONStorableBool(
+            "highlightMirror",
+            ColliderPreviewConfig.DefaultHighlightMirror,
+            value => Config.HighlightMirror = value
+        );
+
         var groups = new List<string> { _noSelectionLabel };
         groups.AddRange(EditablesList.Groups.Select(e => e.Name).Distinct());
         groups.Add(_allLabel);
@@ -150,9 +167,9 @@ public class ColliderVisualizer : MonoBehaviour
         EditablesJSON.valNoCallback = val.Id;
         EditablesList.PrepareForUI();
 
-        Select(ref _selected, val, true);
-        if (Config.SyncSymmetry && _selected.MirrorModel != null)
-            Select(ref _selectedMirror, _selected.MirrorModel, false);
+        Select(ref _selected, val);
+        if (Config.HighlightMirror && _selected.MirrorModel != null)
+            Select(ref _selectedMirror, _selected.MirrorModel, false, true, false);
     }
 
     private void Deselect(ref IModel selected)
@@ -166,11 +183,11 @@ public class ColliderVisualizer : MonoBehaviour
     }
 
     // ReSharper disable once RedundantAssignment
-    private static void Select(ref IModel selected, IModel val, bool showUI)
+    private void Select(ref IModel selected, IModel val, bool shown = true, bool highlighted = true, bool showUI = true)
     {
         selected = val;
-        selected.Shown = true;
-        selected.Highlighted = true;
+        selected.Shown = shown || _filteredEditables.Contains(selected);
+        selected.Highlighted = highlighted;
         selected.Selected = showUI;
         selected.UpdatePreviewsFromConfig();
     }
@@ -193,6 +210,7 @@ public class ColliderVisualizer : MonoBehaviour
             EditablesJSON.choices = _filteredEditables.Select(x => x.Id).ToList();
             EditablesJSON.displayChoices = _filteredEditables.Select(x => x.Label).ToList();
 
+            SelectEditable(_selected);
             foreach (var e in _filteredEditables)
             {
                 e.Shown = true;
@@ -216,8 +234,6 @@ public class ColliderVisualizer : MonoBehaviour
             e.Shown = false;
             e.UpdatePreviewsFromConfig();
         }
-
-        SelectEditable(_selected);
     }
 
     #region Unity events

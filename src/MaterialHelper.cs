@@ -119,7 +119,7 @@ public static class MaterialHelper
         "#FFDEAD",
         "#FFDAB9",
         "#FFE4E1",
-        "#FFF0F5",
+        "#FFF0F5"
     }.Select(CreateMaterial).ToList();
 
     public static Material GetNextMaterial(int hash)

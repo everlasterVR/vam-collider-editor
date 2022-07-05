@@ -1,5 +1,4 @@
 using System;
-using SimpleJSON;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -8,13 +7,13 @@ public abstract class ColliderModel<T> : ColliderModel where T : Collider
 {
     protected new T Collider { get; }
 
-    protected ColliderModel(MVRScript parent, T collider, ColliderPreviewConfig config)
-        : base(parent, collider, config)
+    protected ColliderModel(T collider, ColliderPreviewConfig config)
+        : base(collider, config)
     {
         Collider = collider;
     }
 
-    public override GameObject CreatePreview()
+    protected override GameObject CreatePreview()
     {
         var preview = DoCreatePreview();
 
@@ -37,17 +36,15 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     public string Type => "Collider";
     public Collider Collider { get; set; }
-    public RigidbodyModel RigidbodyModel { get; set; }
-    public GameObject Preview { get; protected set; }
-    public GameObject XRayPreview { get; protected set; }
+    protected GameObject Preview { get; private set; }
+    protected GameObject XRayPreview { get; private set; }
     public bool Shown { get; set; }
-
-    public abstract bool SyncOverrides();
 
     public virtual void UpdatePreviewsFromConfig()
     {
         if (_config.PreviewsEnabled && Shown)
         {
+            // Debug.Log($"{Id} _config.PreviewsEnabled {_config.PreviewsEnabled}, Shown {Shown}");
             if(Preview == null)
             {
                 Preview = CreatePreview();
@@ -58,15 +55,15 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
             if (!_highlighted)
             {
-                var color = previewRenderer.material.color;
+                var color = material.color;
                 color.a = _config.PreviewsOpacity;
-                previewRenderer.material.color = color;
+                material.color = color;
             }
             else
             {
-                var color = previewRenderer.material.color;
+                var color = material.color;
                 color.a = _config.SelectedPreviewsOpacity;
-                previewRenderer.material.color = color;
+                material.color = color;
                 previewRenderer.enabled = false;
                 previewRenderer.enabled = true;
             }
@@ -96,7 +93,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         }
     }
 
-    public void UpdateXRayPreviewFromConfig()
+    private void UpdateXRayPreviewFromConfig()
     {
         if (_config.XRayPreviews)
         {
@@ -137,8 +134,8 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         }
     }
 
-    protected ColliderModel(MVRScript script, Collider collider, ColliderPreviewConfig config)
-        : base(script, collider, CreateLabel(collider))
+    protected ColliderModel(Collider collider, ColliderPreviewConfig config)
+        : base(collider, CreateLabel(collider))
     {
         Collider = collider;
         _config = config;
@@ -146,43 +143,26 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     private static string CreateLabel(Collider collider)
     {
-        var parent = collider.attachedRigidbody != null ? collider.attachedRigidbody.name : collider.transform.parent.name;
-        var label = parent == collider.name ? NameHelper.Simplify(collider.name) : $"{NameHelper.Simplify(parent)}/{NameHelper.Simplify(collider.name)}";
+        string parent = collider.attachedRigidbody != null ? collider.attachedRigidbody.name : collider.transform.parent.name;
+        string label = parent == collider.name ? NameHelper.Simplify(collider.name) : $"{NameHelper.Simplify(parent)}/{NameHelper.Simplify(collider.name)}";
         return $"[co] {label}";
     }
 
-    public static ColliderModel CreateTyped(MVRScript script, Collider collider, ColliderPreviewConfig config)
+    public static ColliderModel CreateTyped(Collider collider, ColliderPreviewConfig config)
     {
         ColliderModel typed;
 
         if (collider is SphereCollider)
-            typed = new SphereColliderModel(script, (SphereCollider)collider, config);
+            typed = new SphereColliderModel((SphereCollider)collider, config);
         else if (collider is BoxCollider)
-            typed = new BoxColliderModel(script, (BoxCollider)collider, config);
+            typed = new BoxColliderModel((BoxCollider)collider, config);
         else if (collider is CapsuleCollider)
-            typed = new CapsuleColliderModel(script, (CapsuleCollider)collider, config);
+            typed = new CapsuleColliderModel((CapsuleCollider)collider, config);
         else
             throw new InvalidOperationException("Unsupported collider type");
 
         return typed;
     }
-
-    protected override void CreateControlsInternal()
-    {
-        if (RigidbodyModel != null)
-        {
-            var goToRigidbodyButton = Script.CreateButton("Go to Rigidbody", true);
-            goToRigidbodyButton.button.onClick.AddListener(() =>
-            {
-                Script.SendMessage("SelectEditable", RigidbodyModel);
-            });
-            RegisterControl(goToRigidbodyButton);
-        }
-
-        DoCreateControls();
-    }
-
-    public abstract void DoCreateControls();
 
     public virtual void DestroyPreviews()
     {
@@ -208,11 +188,11 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         }
     }
 
-    public abstract GameObject CreatePreview();
+    protected abstract GameObject CreatePreview();
 
     protected abstract GameObject DoCreatePreview();
 
-    public override void SetHighlighted(bool value)
+    public virtual void SetHighlighted(bool value)
     {
         if (_highlighted == value) return;
 
@@ -221,7 +201,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         RefreshHighlightedXRayPreview();
     }
 
-    protected void RefreshHighlightedPreview()
+    private void RefreshHighlightedPreview()
     {
         if (Preview != null)
         {
@@ -232,27 +212,16 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         }
     }
 
-    protected void RefreshHighlightedXRayPreview()
+    private void RefreshHighlightedXRayPreview()
     {
         if (XRayPreview != null)
         {
             var previewRenderer = XRayPreview.GetComponent<Renderer>();
             var color = previewRenderer.material.color;
-            var alpha = _highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
+            float alpha = _highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
             color.a = _config.RelativeXRayOpacity * alpha;
             previewRenderer.material.color = color;
         }
-    }
-
-    public override void LoadJson(JSONClass jsonClass)
-    {
-        base.LoadJson(jsonClass);
-        SyncPreviews();
-    }
-
-    protected override void DoResetToInitial()
-    {
-        SyncPreviews();
     }
 
     public override string ToString() => Id;

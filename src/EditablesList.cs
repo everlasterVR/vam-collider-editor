@@ -4,55 +4,66 @@ using UnityEngine;
 
 public class EditablesList
 {
-    public static EditablesList Build(MVRScript script, ColliderPreviewConfig config)
+    public static EditablesList Build(
+        Atom containingAtom,
+        ColliderPreviewConfig config,
+        List<Group> customGroups
+    )
     {
-        var containingAtom = script.containingAtom;
-
-        var groups = containingAtom.type == "Person"
-                 ? new List<Group>
-                 {
-                    new Group("Head / Ears", @"^((AutoCollider(Female)?)?AutoColliders)?(s?[Hh]ead|lowerJaw|[Tt]ongue|neck|s?Face|_?Collider(Lip|Ear|Nose))"),
-                    new Group("Left arm", @"^l(Shldr|ForeArm)"),
-                    new Group("Left hand", @"^l(Index|Mid|Ring|Pinky|Thumb|Carpal|Hand)[0-9]?$"),
-                    new Group("Right arm", @"^r(Shldr|ForeArm)"),
-                    new Group("Right hand", @"^r(Index|Mid|Ring|Pinky|Thumb|Carpal|Hand)[0-9]?$"),
-                    new Group("Chest", @"^(chest|(AutoCollider)?FemaleAutoColliderschest|MaleAutoColliderschest)"),
-                    new Group("Breasts", @"(Pectoral|Nipple)"),
-                    new Group("Left breast", @"l(Pectoral|Nipple)"),
-                    new Group("Right breast", @"r(Pectoral|Nipple)"),
-                    new Group("Abdomen / Belly / Back", @"^((AutoCollider)?FemaleAutoColliders)?abdomen"),
-                    new Group("Hip / Pelvis", @"^((Female)?AutoColliders?|MaleAutoColliders)?(hip|pelvis)"),
-                    new Group("Glutes", @"^((AutoCollider)?FemaleAutoColliders)?[LR]Glute"),
-                    new Group("Left glute", @"^((AutoCollider)?FemaleAutoColliders)?LGlute"),
-                    new Group("Right glute", @"^((AutoCollider)?FemaleAutoColliders)?RGlute"),
-                    new Group("Anus", @"^_JointA[rl]"),
-                    new Group("Vagina", @"^_Joint(Gr|Gl|B)"),
-                    new Group("Penis", @"^((AutoCollider)?Gen[1-3])|Testes"),
-                    new Group("Left leg", @"^((AutoCollider)?(FemaleAutoColliders)?)?l(Thigh|Shin)"),
-                    new Group("Left foot", @"^l(Foot|Toe|BigToe|SmallToe)"),
-                    new Group("Right leg", @"^((AutoCollider)?(FemaleAutoColliders)?)?r(Thigh|Shin)"),
-                    new Group("Right foot", @"^r(Foot|Toe|BigToe|SmallToe)"),
-                    new Group("Physics mesh joints", @"^PhysicsMeshJoint.+$")
-                 }
-                 : new List<Group>
-                 {
-                    new Group("All", @"^.+$"),
-                 };
+        List<Group> groups;
+        if (customGroups != null)
+        {
+            groups = customGroups;
+        }
+        else if (containingAtom.type == "Person")
+        {
+            groups = new List<Group>
+            {
+                new Group("Head / Ears", @"^((AutoCollider(Female)?)?AutoColliders)?(s?[Hh]ead|lowerJaw|[Tt]ongue|neck|s?Face|_?Collider(Lip|Ear|Nose))"),
+                new Group("Left arm", @"^l(Shldr|ForeArm)"),
+                new Group("Left hand", @"^l(Index|Mid|Ring|Pinky|Thumb|Carpal|Hand)[0-9]?$"),
+                new Group("Right arm", @"^r(Shldr|ForeArm)"),
+                new Group("Right hand", @"^r(Index|Mid|Ring|Pinky|Thumb|Carpal|Hand)[0-9]?$"),
+                new Group("Chest", @"^(chest|(AutoCollider)?FemaleAutoColliderschest|MaleAutoColliderschest)"),
+                new Group("Breasts", @"(Pectoral|Nipple)"),
+                new Group("Left breast", @"l(Pectoral|Nipple)"),
+                new Group("Right breast", @"r(Pectoral|Nipple)"),
+                new Group("Abdomen / Belly / Back", @"^((AutoCollider)?FemaleAutoColliders)?abdomen"),
+                new Group("Hip / Pelvis", @"^((Female)?AutoColliders?|MaleAutoColliders)?(hip|pelvis)"),
+                new Group("Glutes", @"^((AutoCollider)?FemaleAutoColliders)?[LR]Glute"),
+                new Group("Left glute", @"^((AutoCollider)?FemaleAutoColliders)?LGlute"),
+                new Group("Right glute", @"^((AutoCollider)?FemaleAutoColliders)?RGlute"),
+                new Group("Anus", @"^_JointA[rl]"),
+                new Group("Vagina", @"^_Joint(Gr|Gl|B)"),
+                new Group("Penis", @"^((AutoCollider)?Gen[1-3])|Testes"),
+                new Group("Left leg", @"^((AutoCollider)?(FemaleAutoColliders)?)?l(Thigh|Shin)"),
+                new Group("Left foot", @"^l(Foot|Toe|BigToe|SmallToe)"),
+                new Group("Right leg", @"^((AutoCollider)?(FemaleAutoColliders)?)?r(Thigh|Shin)"),
+                new Group("Right foot", @"^r(Foot|Toe|BigToe|SmallToe)"),
+                new Group("Physics mesh joints", @"^PhysicsMeshJoint.+$")
+            };
+        }
+        else
+        {
+            groups = new List<Group>
+            {
+                new Group("All", @"^.+$"),
+            };
+        }
         var other = new List<Group> { new Group("Other", "") };
 
         // AutoColliders
 
         var autoColliderDuplicates = new HashSet<string>();
         var autoColliders = containingAtom.GetComponentsInChildren<AutoCollider>()
-            .Select(autoCollider => new AutoColliderModel(script, autoCollider, config))
-            .Where(model => { if (!autoColliderDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
+            .Select(autoCollider => new AutoColliderModel(autoCollider, config))
+            .Where(model => autoColliderDuplicates.Add(model.Id))
             .ForEach(model => {
                 var matching = groups.Where(g => g.Test(model.AutoCollider.name));
                 model.Groups.AddRange(matching.Any() ? matching : other);
             })
             .ToList();
 
-        var autoCollidersRigidBodies = new HashSet<Rigidbody>(autoColliders.SelectMany(x => x.GetRigidbodies()));
         var autoCollidersColliders = new HashSet<Collider>(autoColliders.SelectMany(x => x.GetColliders()).Select(x => x.Collider));
         var autoCollidersMap = autoColliders.ToDictionary(x => x.AutoCollider);
 
@@ -63,33 +74,14 @@ public class EditablesList
             .Select(autoColliderGroup =>
             {
                 var childAutoColliders = autoColliderGroup.GetAutoColliders().Where(acg => autoCollidersMap.ContainsKey(acg)).Select(acg => autoCollidersMap[acg]).ToList();
-                var model = new AutoColliderGroupModel(script, autoColliderGroup, childAutoColliders);
-                childAutoColliders.ForEach(ac => ac.AutoColliderGroup = model);
-                return model;
+                return new AutoColliderGroupModel(autoColliderGroup, childAutoColliders);
             })
-            .Where(model => { if (!autoColliderGroupDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
+            .Where(model => autoColliderGroupDuplicates.Add(model.Id))
             .ForEach(model => {
                 var matching = groups.Where(g => g.Test(model.AutoColliderGroup.name));
                 model.Groups.AddRange(matching.Any() ? matching : other);
             })
             .ToList();
-
-        // Rigidbodies
-
-        var rigidbodyDuplicates = new HashSet<string>();
-        var controllerRigidbodies = new HashSet<Rigidbody>(containingAtom.freeControllers.SelectMany(fc => fc.GetComponents<Rigidbody>()));
-        var rigidbodies = containingAtom.GetComponentsInChildren<Rigidbody>(true)
-            .Where(rigidbody => !autoCollidersRigidBodies.Contains(rigidbody))
-            .Where(rigidbody => !controllerRigidbodies.Contains(rigidbody))
-            .Where(rigidbody => IsRigidbodyIncluded(rigidbody))
-            .Select(rigidbody => new RigidbodyModel(script, rigidbody))
-            .Where(model => { if (!rigidbodyDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
-            .ForEach(model => {
-                var matching = groups.Where(g => g.Test(model.Rigidbody.name));
-                model.Groups.AddRange(matching.Any() ? matching : other);
-            })
-            .ToList();
-        var rigidbodiesDict = rigidbodies.ToDictionary(x => x.Id);
 
         // Colliders
 
@@ -98,49 +90,17 @@ public class EditablesList
             .Where(collider => collider.gameObject.activeInHierarchy)
             .Where(collider => !autoCollidersColliders.Contains(collider))
             .Where(collider => collider.attachedRigidbody == null || IsRigidbodyIncluded(collider.attachedRigidbody))
-            .Where(collider => IsColliderIncluded(collider))
-            .Select(collider => ColliderModel.CreateTyped(script, collider, config))
-            .Where(model => { if (!colliderDuplicates.Add(model.Id)) { model.IsDuplicate = true; return false; } else { return true; } })
+            .Where(IsColliderIncluded)
+            .Select(collider => ColliderModel.CreateTyped(collider, config))
+            .Where(model => colliderDuplicates.Add(model.Id))
             .ToList();
 
-        // Attach colliders to rigidbodies
-
-        foreach (var colliderModel in colliders)
-        {
-            if (colliderModel.Collider.attachedRigidbody != null)
-            {
-                RigidbodyModel rigidbodyModel;
-                if (rigidbodiesDict.TryGetValue(colliderModel.Collider.attachedRigidbody.Uuid(), out rigidbodyModel))
-                {
-                    colliderModel.RigidbodyModel = rigidbodyModel;
-                    rigidbodyModel.Colliders.Add(colliderModel);
-                    colliderModel.Groups = rigidbodyModel.Groups;
-                }
-                else
-                {
-                    SuperController.LogError($"Could not find a matching rigidbody for collider '{colliderModel.Id}', rigidbody '{colliderModel.Collider.attachedRigidbody.Uuid()}'.");
-                    var matching = groups.Where(g => g.Test(colliderModel.Collider.name));
-                    colliderModel.Groups.AddRange(matching.Any() ? matching : other);
-                }
-            }
-            else
-            {
-                var matching = groups.Where(g => g.Test(colliderModel.Collider.name));
-                colliderModel.Groups.AddRange(matching.Any() ? matching : other);
-            }
-        }
-
-        // Some rigidbodies have collisions even though they have no colliders...
-        // rigidbodies.RemoveAll(model => model.Colliders.Count == 0);
-
         // All Editables
-
         return new EditablesList(
             groups.Concat(other).ToList(),
             colliders,
             autoColliders,
-            autoColliderGroups,
-            rigidbodies
+            autoColliderGroups
         );
     }
 
@@ -176,23 +136,20 @@ public class EditablesList
     public readonly List<ColliderModel> Colliders;
     public readonly List<AutoColliderModel> AutoColliders;
     public readonly List<AutoColliderGroupModel> AutoColliderGroups;
-    public readonly List<RigidbodyModel> Rigidbodies;
     public List<IModel> All { get; }
     public Dictionary<string, IModel> ByUuid { get; }
     private bool _readyForUI;
 
-    private EditablesList(List<Group> groups, List<ColliderModel> colliders, List<AutoColliderModel> autoColliders, List<AutoColliderGroupModel> autoColliderGroups, List<RigidbodyModel> rigidbodies)
+    private EditablesList(List<Group> groups, List<ColliderModel> colliders, List<AutoColliderModel> autoColliders, List<AutoColliderGroupModel> autoColliderGroups)
     {
         Groups = groups;
         Colliders = colliders;
         AutoColliders = autoColliders;
         AutoColliderGroups = autoColliderGroups;
-        Rigidbodies = rigidbodies;
 
         All = colliders.Cast<IModel>()
             .Concat(autoColliderGroups.Cast<IModel>())
             .Concat(autoColliders.Cast<IModel>())
-            .Concat(rigidbodies.Cast<IModel>())
             .OrderBy(a => a.Label)
             .ToList();
 
@@ -206,7 +163,6 @@ public class EditablesList
         MatchMirror<AutoColliderModel, AutoCollider>(AutoColliders);
         MatchMirror<AutoColliderGroupModel, AutoColliderGroup>(AutoColliderGroups);
         MatchMirror<ColliderModel, Collider>(Colliders);
-        MatchMirror<RigidbodyModel, Rigidbody>(Rigidbodies);
     }
 
     private static void MatchMirror<TModel, TComponent>(List<TModel> items)
@@ -230,8 +186,6 @@ public class EditablesList
             if (!map.TryGetValue(rightId, out right))
             {
                 if (left.Id.Contains("Shin")) continue;
-                // SuperController.LogError("NOT MATCHED:\n" + left.Id + "\n" + rightId);
-                continue;
             }
             left.Mirror = right;
             right.Mirror = left;

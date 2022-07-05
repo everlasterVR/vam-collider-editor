@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 public class Group
 {
-    public string Name { get; set; }
-    public Regex Pattern { get; set; }
-    public List<IModel> Editables { get; } = new List<IModel>();
+    public string Name { get; }
+    private Regex Pattern { get; }
 
     public Group(string name, string pattern)
     {

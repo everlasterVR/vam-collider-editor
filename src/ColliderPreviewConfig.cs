@@ -1,3 +1,5 @@
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 public class ColliderPreviewConfig
 {
     public const float ExponentialScaleMiddle = 0.1f;

@@ -10,12 +10,6 @@ public static class ComponentExtensions
         return component.GetTypeName() + ":" + string.Join(".", paths.ToArray());
     }
 
-    public static string Hierarchy(this Component component)
-    {
-        var paths = BuildStack(component);
-        return string.Join("\r\n", paths.ToArray());
-    }
-
     private static Stack<string> BuildStack(Component component)
     {
         var paths = new Stack<string>(new[] { $"{component.name}" });
@@ -39,6 +33,7 @@ public static class ComponentExtensions
         return true;
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static string GetTypeName(this Component component)
     {
         if (component is CapsuleCollider)
@@ -54,20 +49,5 @@ public static class ComponentExtensions
         if (component is Rigidbody)
             return nameof(Rigidbody);
         throw new InvalidOperationException($"Unknown component type: {component.GetType()}");
-    }
-
-    public static UIDynamic CreateFloatSlider(this MVRScript script, JSONStorableFloat jsf, string label, bool rightSide = true, string valueFormat = "F8")
-    {
-        var control = script.CreateSlider(jsf, rightSide);
-        control.valueFormat = valueFormat;
-        control.label = label;
-        return control;
-    }
-
-    public static UIDynamic CreateToggle(this MVRScript script, JSONStorableBool jsb, string label, bool rightSide = true)
-    {
-        var control = script.CreateToggle(jsb, rightSide);
-        control.label = label;
-        return control;
     }
 }

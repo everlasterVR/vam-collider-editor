@@ -23,7 +23,7 @@ public static class Mirrors
     public static string Find(string name)
     {
         var matched = false;
-        var s = name;
+        string s = name;
 
         foreach (var entry in _map)
         {

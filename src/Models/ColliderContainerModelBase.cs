@@ -25,12 +25,12 @@ public abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Com
         }
     }
 
-    protected ColliderContainerModelBase(MVRScript script, T component, string label)
-        : base(script, component, label)
+    protected ColliderContainerModelBase(T component, string label)
+        : base(component, label)
     {
     }
 
-    public override void SetHighlighted(bool value)
+    public virtual void SetHighlighted(bool value)
     {
         foreach (var collider in GetColliders())
             collider.SetHighlighted(value);

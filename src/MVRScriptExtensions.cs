@@ -12,16 +12,17 @@ public static class MVRScriptExtensions
     )
     {
         var popup = script.CreateFilterablePopup(jssc, rightSide);
+        var uiPopup = popup.popup;
 
-        popup.popup.labelText.alignment = TextAnchor.UpperCenter;
-        popup.popup.labelText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0.89f);
+        uiPopup.labelText.alignment = TextAnchor.UpperCenter;
+        uiPopup.labelText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0.89f);
 
         {
             var btn = script.InstantiateButtonTransform();
             btn.SetParent(popup.transform, false);
             Object.Destroy(btn.GetComponent<LayoutElement>());
             btn.GetComponent<UIDynamicButton>().label = "<";
-            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => popup.popup.SetPreviousValue());
+            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => uiPopup.SelectPrevious());
             var prevBtnRect = btn.GetComponent<RectTransform>();
             prevBtnRect.pivot = new Vector2(0, 0);
             prevBtnRect.anchoredPosition = new Vector2(10f, 0);
@@ -37,7 +38,7 @@ public static class MVRScriptExtensions
             btn.SetParent(popup.transform, false);
             Object.Destroy(btn.GetComponent<LayoutElement>());
             btn.GetComponent<UIDynamicButton>().label = ">";
-            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => popup.popup.SetNextValue());
+            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => uiPopup.SelectNext());
             var prevBtnRect = btn.GetComponent<RectTransform>();
             prevBtnRect.pivot = new Vector2(0, 0);
             prevBtnRect.anchoredPosition = new Vector2(10f, 0);
@@ -55,8 +56,8 @@ public static class MVRScriptExtensions
 
         if(upwards)
         {
-            popup.popup.popupPanel.offsetMin += new Vector2(0, popup.popupPanelHeight + 60);
-            popup.popup.popupPanel.offsetMax += new Vector2(0, popup.popupPanelHeight + 60);
+            uiPopup.popupPanel.offsetMin += new Vector2(0, popup.popupPanelHeight + 60);
+            uiPopup.popupPanel.offsetMax += new Vector2(0, popup.popupPanelHeight + 60);
         }
 
         return popup;

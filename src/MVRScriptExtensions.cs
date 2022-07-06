@@ -22,7 +22,11 @@ public static class MVRScriptExtensions
             btn.SetParent(popup.transform, false);
             Object.Destroy(btn.GetComponent<LayoutElement>());
             btn.GetComponent<UIDynamicButton>().label = "<";
-            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => uiPopup.SelectPrevious());
+            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() =>
+            {
+                uiPopup.visible = false;
+                uiPopup.SelectPrevious();
+            });
             var prevBtnRect = btn.GetComponent<RectTransform>();
             prevBtnRect.pivot = new Vector2(0, 0);
             prevBtnRect.anchoredPosition = new Vector2(10f, 0);
@@ -38,7 +42,11 @@ public static class MVRScriptExtensions
             btn.SetParent(popup.transform, false);
             Object.Destroy(btn.GetComponent<LayoutElement>());
             btn.GetComponent<UIDynamicButton>().label = ">";
-            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() => uiPopup.SelectNext());
+            btn.GetComponent<UIDynamicButton>().button.onClick.AddListener(() =>
+            {
+                uiPopup.visible = false;
+                uiPopup.SelectNext();
+            });
             var prevBtnRect = btn.GetComponent<RectTransform>();
             prevBtnRect.pivot = new Vector2(0, 0);
             prevBtnRect.anchoredPosition = new Vector2(10f, 0);

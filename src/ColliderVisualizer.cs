@@ -55,7 +55,11 @@ public class ColliderVisualizer : MonoBehaviour
 
     private void SetupStorables()
     {
-        ShowPreviewsJSON = new JSONStorableBool("showPreviews", ColliderPreviewConfig.DefaultPreviewsEnabled)
+        ShowPreviewsJSON = new JSONStorableBool("showPreviews", ColliderPreviewConfig.DefaultPreviewsEnabled, value =>
+        {
+            Config.PreviewsEnabled = value;
+            foreach(var editable in EditablesList.All) editable.UpdatePreviewsFromConfig();
+        })
         {
             isStorable = false,
             isRestorable = false
@@ -147,12 +151,6 @@ public class ColliderVisualizer : MonoBehaviour
         };
     }
 
-    public void ShowPreviewsCallback(bool value)
-    {
-        Config.PreviewsEnabled = value;
-        foreach(var editable in EditablesList.All) editable.UpdatePreviewsFromConfig();
-    }
-
     public void SelectEditable(IModel val)
     {
         Deselect(ref _selected);
@@ -238,6 +236,11 @@ public class ColliderVisualizer : MonoBehaviour
 
     #region Unity events
 
+    public void Update()
+    {
+        SyncPreviews();
+    }
+
     public void OnEnable()
     {
         if (EditablesList?.All == null || ShowPreviewsJSON == null) return;
@@ -274,7 +277,7 @@ public class ColliderVisualizer : MonoBehaviour
 
     public void SyncPreviews()
     {
-        if(EditablesList != null && ShowPreviewsJSON.val)
+        if(EditablesList != null && ShowPreviewsJSON != null && ShowPreviewsJSON.val)
         {
             EditablesList.All.ForEach(editable => editable.SyncPreviews());
         }

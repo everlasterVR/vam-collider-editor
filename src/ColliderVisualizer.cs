@@ -236,11 +236,6 @@ public class ColliderVisualizer : MonoBehaviour
 
     #region Unity events
 
-    public void Update()
-    {
-        SyncPreviews();
-    }
-
     public void OnEnable()
     {
         if (EditablesList?.All == null || ShowPreviewsJSON == null) return;

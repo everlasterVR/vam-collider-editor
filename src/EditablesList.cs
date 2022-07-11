@@ -59,7 +59,7 @@ public class EditablesList
             .Select(autoCollider => new AutoColliderModel(autoCollider, config))
             .Where(model => autoColliderDuplicates.Add(model.Id))
             .ForEach(model => {
-                var matching = groups.Where(g => g.Test(model.AutoCollider.name));
+                var matching = groups.Where(g => g.Test(model.AutoCollider.name)).ToList();
                 model.Groups.AddRange(matching.Any() ? matching : other);
             })
             .ToList();
@@ -78,7 +78,7 @@ public class EditablesList
             })
             .Where(model => autoColliderGroupDuplicates.Add(model.Id))
             .ForEach(model => {
-                var matching = groups.Where(g => g.Test(model.AutoColliderGroup.name));
+                var matching = groups.Where(g => g.Test(model.AutoColliderGroup.name)).ToList();
                 model.Groups.AddRange(matching.Any() ? matching : other);
             })
             .ToList();
@@ -89,7 +89,7 @@ public class EditablesList
         var colliders = containingAtom.GetComponentsInChildren<Collider>(true)
             .Where(collider => collider.gameObject.activeInHierarchy)
             .Where(collider => !autoCollidersColliders.Contains(collider))
-            .Where(collider => collider.attachedRigidbody == null || IsRigidbodyIncluded(collider.attachedRigidbody))
+            .Where(collider => IsRigidbodyIncluded(collider.attachedRigidbody))
             .Where(IsColliderIncluded)
             .Select(collider => ColliderModel.CreateTyped(collider, config))
             .Where(model => colliderDuplicates.Add(model.Id))
@@ -121,6 +121,7 @@ public class EditablesList
 
     private static bool IsRigidbodyIncluded(Rigidbody rigidbody)
     {
+        if (rigidbody == null) return false;
         if (rigidbody.isKinematic) return false;
         if (rigidbody.name == "control") return false;
         if (rigidbody.name == "object") return false;

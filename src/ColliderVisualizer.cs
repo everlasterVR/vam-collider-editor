@@ -234,6 +234,17 @@ public class ColliderVisualizer : MonoBehaviour
         }
     }
 
+    public void DestroyAllPreviews()
+    {
+        if(EditablesList?.All != null)
+        {
+            foreach (var editable in EditablesList.All)
+            {
+                editable.DestroyPreviews();
+            }
+        }
+    }
+
     #region Unity events
 
     public void OnEnable()
@@ -254,13 +265,9 @@ public class ColliderVisualizer : MonoBehaviour
 
     public void OnDisable()
     {
-        if (EditablesList?.All == null) return;
         try
         {
-            foreach (var editable in EditablesList.All)
-            {
-                editable.DestroyPreviews();
-            }
+            DestroyAllPreviews();
         }
         catch (Exception e)
         {

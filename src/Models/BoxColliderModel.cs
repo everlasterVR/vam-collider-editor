@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BoxColliderModel : ColliderModel<BoxCollider>
@@ -7,12 +9,15 @@ public class BoxColliderModel : ColliderModel<BoxCollider>
     {
     }
 
-    protected override GameObject DoCreatePreview() => GameObject.CreatePrimitive(PrimitiveType.Cube);
+    protected override List<GameObject> DoCreatePreview() => new List<GameObject>
+    {
+        GameObject.CreatePrimitive(PrimitiveType.Cube)
+    };
 
     public override void SyncPreviews()
     {
-        SyncPreview(Preview);
-        SyncPreview(XRayPreview);
+        SyncPreview(Preview?.First());
+        SyncPreview(XRayPreview?.First());
     }
 
     private void SyncPreview(GameObject preview)

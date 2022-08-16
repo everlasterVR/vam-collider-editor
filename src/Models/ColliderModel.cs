@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -13,19 +14,23 @@ public abstract class ColliderModel<T> : ColliderModel where T : Collider
         Collider = collider;
     }
 
-    protected override GameObject CreatePreview()
+    protected override List<GameObject> CreatePreviewPrimitives()
     {
-        var preview = DoCreatePreview();
+        var previewPrimitives = DoCreatePreview();
 
-        preview.GetComponent<Renderer>().material = MaterialHelper.GetNextMaterial(Id.GetHashCode());
-        foreach (var c in preview.GetComponents<Collider>())
+        foreach(var primitive in previewPrimitives)
         {
-            c.enabled = false;
-            Object.Destroy(c);
+            primitive.GetComponent<Renderer>().material = MaterialHelper.GetNextMaterial(Id.GetHashCode());
+            foreach (var c in primitive.GetComponents<Collider>())
+            {
+                c.enabled = false;
+                Object.Destroy(c);
+            }
+
+            primitive.transform.SetParent(Collider.transform, false);
         }
 
-        preview.transform.SetParent(Collider.transform, false);
-        return preview;
+        return previewPrimitives;
     }
 }
 
@@ -34,50 +39,50 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
     private readonly ColliderPreviewConfig _config;
 
     public string Type => "Collider";
-    public Collider Collider { get; set; }
-    protected GameObject Preview { get; private set; }
-    protected GameObject XRayPreview { get; private set; }
+    public Collider Collider { get; }
+    protected List<GameObject> Preview { get; private set; }
+    protected List<GameObject> XRayPreview { get; private set; }
     public bool Shown { get; set; }
 
     public virtual void UpdatePreviewsFromConfig()
     {
         if (_config.PreviewsEnabled && Shown)
         {
-            // Debug.Log($"{Id} _config.PreviewsEnabled {_config.PreviewsEnabled}, Shown {Shown}");
             if(Preview == null)
             {
-                Preview = CreatePreview();
+                Preview = CreatePreviewPrimitives();
             }
 
-            var previewRenderer = Preview.GetComponent<Renderer>();
-            var material = previewRenderer.material;
+            foreach(var primitive in Preview)
+            {
+                var previewRenderer = primitive.GetComponent<Renderer>();
+                var material = previewRenderer.material;
 
-            if (!Highlighted)
-            {
-                var color = material.color;
-                color.a = _config.PreviewsOpacity;
-                material.color = color;
-            }
-            else
-            {
-                var color = material.color;
-                color.a = _config.SelectedPreviewsOpacity;
-                material.color = color;
-                previewRenderer.enabled = false;
-                previewRenderer.enabled = true;
-            }
+                if (!Highlighted)
+                {
+                    var color = material.color;
+                    color.a = _config.PreviewsOpacity;
+                    material.color = color;
+                }
+                else
+                {
+                    var color = material.color;
+                    color.a = _config.SelectedPreviewsOpacity;
+                    material.color = color;
+                }
 
-            if (material.shader.name != "Standard")
-            {
-                material.shader = Shader.Find("Standard");
-                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                material.SetInt("_ZWrite", 0);
-                material.DisableKeyword("_ALPHATEST_ON");
-                material.EnableKeyword("_ALPHABLEND_ON");
-                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.renderQueue = 3000;
-                previewRenderer.material = material;
+                if (material.shader.name != "Standard")
+                {
+                    material.shader = Shader.Find("Standard");
+                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    material.SetInt("_ZWrite", 0);
+                    material.DisableKeyword("_ALPHATEST_ON");
+                    material.EnableKeyword("_ALPHABLEND_ON");
+                    material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                    material.renderQueue = 3000;
+                    previewRenderer.material = material;
+                }
             }
 
             UpdateXRayPreviewFromConfig();
@@ -98,33 +103,36 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         {
             if(XRayPreview == null)
             {
-                XRayPreview = CreatePreview();
+                XRayPreview = CreatePreviewPrimitives();
             }
 
-            var previewRenderer = XRayPreview.GetComponent<Renderer>();
-            var material = previewRenderer.material;
+            foreach(var primitive in XRayPreview)
+            {
+                var previewRenderer = primitive.GetComponent<Renderer>();
+                var material = previewRenderer.material;
 
-            if (!Highlighted)
-            {
-                var color = previewRenderer.material.color;
-                color.a = _config.RelativeXRayOpacity * _config.PreviewsOpacity;
-                previewRenderer.material.color = color;
-            }
-            else
-            {
-                var color = previewRenderer.material.color;
-                color.a = _config.RelativeXRayOpacity * _config.SelectedPreviewsOpacity;
-                previewRenderer.material.color = color;
-                previewRenderer.enabled = false;
-                previewRenderer.enabled = true;
-            }
+                if (!Highlighted)
+                {
+                    var color = previewRenderer.material.color;
+                    color.a = _config.RelativeXRayOpacity * _config.PreviewsOpacity;
+                    material.color = color;
+                }
+                else
+                {
+                    var color = previewRenderer.material.color;
+                    color.a = _config.RelativeXRayOpacity * _config.SelectedPreviewsOpacity;
+                    material.color = color;
+                    previewRenderer.enabled = false;
+                    previewRenderer.enabled = true;
+                }
 
-            if (material.shader.name != "Battlehub/RTGizmos/Handles")
-            {
-                material.shader = Shader.Find("Battlehub/RTGizmos/Handles");
-                material.SetFloat("_Offset", 1f);
-                material.SetFloat("_MinAlpha", 1f);
-                previewRenderer.material = material;
+                if (material.shader.name != "Battlehub/RTGizmos/Handles")
+                {
+                    material.shader = Shader.Find("Battlehub/RTGizmos/Handles");
+                    material.SetFloat("_Offset", 1f);
+                    material.SetFloat("_MinAlpha", 1f);
+                    previewRenderer.material = material;
+                }
             }
         }
         else
@@ -171,25 +179,27 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     private void DestroyPreview()
     {
-        if (Preview != null)
-        {
-            Object.Destroy(Preview);
-            Preview = null;
-        }
+        if (Preview == null) return;
+
+        foreach(var primitive in Preview)
+            Object.Destroy(primitive);
+
+        Preview = null;
     }
 
     private void DestroyXRayPreview()
     {
-        if (XRayPreview != null)
-        {
-            Object.Destroy(XRayPreview);
-            XRayPreview = null;
-        }
+        if (XRayPreview == null) return;
+
+        foreach(var primitive in XRayPreview)
+            Object.Destroy(primitive);
+
+        XRayPreview = null;
     }
 
-    protected abstract GameObject CreatePreview();
+    protected abstract List<GameObject> CreatePreviewPrimitives();
 
-    protected abstract GameObject DoCreatePreview();
+    protected abstract List<GameObject> DoCreatePreview();
 
     public void SetHighlighted(bool value)
     {
@@ -202,9 +212,11 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     private void RefreshHighlightedPreview()
     {
-        if (Preview != null)
+        if (Preview == null) return;
+
+        foreach(var primitive in Preview)
         {
-            var previewRenderer = Preview.GetComponent<Renderer>();
+            var previewRenderer = primitive.GetComponent<Renderer>();
             var color = previewRenderer.material.color;
             color.a = Highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
             previewRenderer.material.color = color;
@@ -213,9 +225,11 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     private void RefreshHighlightedXRayPreview()
     {
-        if (XRayPreview != null)
+        if (XRayPreview == null) return;
+
+        foreach(var primitive in XRayPreview)
         {
-            var previewRenderer = XRayPreview.GetComponent<Renderer>();
+            var previewRenderer = primitive.GetComponent<Renderer>();
             var color = previewRenderer.material.color;
             float alpha = Highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
             color.a = _config.RelativeXRayOpacity * alpha;

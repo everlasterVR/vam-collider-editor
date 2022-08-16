@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SphereColliderModel : ColliderModel<SphereCollider>
@@ -7,12 +9,15 @@ public class SphereColliderModel : ColliderModel<SphereCollider>
     {
     }
 
-    protected override GameObject DoCreatePreview() => GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    protected override List<GameObject> DoCreatePreview() => new List<GameObject>
+    {
+        GameObject.CreatePrimitive(PrimitiveType.Sphere)
+    };
 
     public override void SyncPreviews()
     {
-        SyncPreview(Preview);
-        SyncPreview(XRayPreview);
+        SyncPreview(Preview?.First());
+        SyncPreview(XRayPreview?.First());
     }
 
     private void SyncPreview(GameObject preview)

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
@@ -8,7 +7,7 @@ public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
     {
     }
 
-    protected override List<GameObject> DoCreatePreview() => new List<GameObject>
+    protected override GameObject[] DoCreatePreview() => new[]
     {
         GameObject.CreatePrimitive(PrimitiveType.Sphere),
         GameObject.CreatePrimitive(PrimitiveType.Cylinder),
@@ -21,20 +20,20 @@ public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
         SyncPreview(XRayPreview);
     }
 
-    private void SyncPreview(List<GameObject> preview)
+    private void SyncPreview(GameObject[] preview)
     {
         if (preview == null) return;
 
         float radius = Collider.radius;
         float height = Collider.height;
 
-        float d = radius * 2;
-        float offset = height > d ? (height - d) / 2 : 0;
+        float diameter = radius * 2;
+        float offset = height > diameter ? (height - diameter) / 2 : 0;
 
         /* top sphere */
         {
             var primitive = preview[0];
-            primitive.transform.localScale = new Vector3(d, d, d);
+            primitive.transform.localScale = new Vector3(diameter, diameter, diameter);
             SetRotation(primitive, Collider.direction);
 
             primitive.transform.localPosition = Collider.center;
@@ -48,7 +47,7 @@ public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
             if(offset > 0)
             {
                 previewRenderer.enabled = true;
-                primitive.transform.localScale = new Vector3(d, offset, d);
+                primitive.transform.localScale = new Vector3(diameter, offset, diameter);
                 SetRotation(primitive, Collider.direction);
                 primitive.transform.localPosition = Collider.center;
             }
@@ -65,7 +64,7 @@ public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
             if(offset > 0)
             {
                 previewRenderer.enabled = true;
-                primitive.transform.localScale = new Vector3(d, d, d);
+                primitive.transform.localScale = new Vector3(diameter, diameter, diameter);
                 SetRotation(primitive, Collider.direction);
 
                 primitive.transform.localPosition = Collider.center;

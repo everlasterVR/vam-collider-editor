@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -14,7 +13,7 @@ public abstract class ColliderModel<T> : ColliderModel where T : Collider
         Collider = collider;
     }
 
-    protected override List<GameObject> CreatePreviewPrimitives()
+    protected override GameObject[] CreatePreviewPrimitives()
     {
         var previewPrimitives = DoCreatePreview();
 
@@ -40,8 +39,8 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     public string Type => "Collider";
     public Collider Collider { get; }
-    protected List<GameObject> Preview { get; private set; }
-    protected List<GameObject> XRayPreview { get; private set; }
+    protected GameObject[] Preview { get; private set; }
+    protected GameObject[] XRayPreview { get; private set; }
     public bool Shown { get; set; }
 
     public virtual void UpdatePreviewsFromConfig()
@@ -57,19 +56,9 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
             {
                 var previewRenderer = primitive.GetComponent<Renderer>();
                 var material = previewRenderer.material;
-
-                if (!Highlighted)
-                {
-                    var color = material.color;
-                    color.a = _config.PreviewsOpacity;
-                    material.color = color;
-                }
-                else
-                {
-                    var color = material.color;
-                    color.a = _config.SelectedPreviewsOpacity;
-                    material.color = color;
-                }
+                var color = material.color;
+                color.a = Highlighted ? _config.SelectedPreviewsOpacity : _config.PreviewsOpacity;
+                material.color = color;
 
                 if (material.shader.name != "Standard")
                 {
@@ -110,21 +99,11 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
             {
                 var previewRenderer = primitive.GetComponent<Renderer>();
                 var material = previewRenderer.material;
-
-                if (!Highlighted)
-                {
-                    var color = previewRenderer.material.color;
-                    color.a = _config.RelativeXRayOpacity * _config.PreviewsOpacity;
-                    material.color = color;
-                }
-                else
-                {
-                    var color = previewRenderer.material.color;
-                    color.a = _config.RelativeXRayOpacity * _config.SelectedPreviewsOpacity;
-                    material.color = color;
-                    previewRenderer.enabled = false;
-                    previewRenderer.enabled = true;
-                }
+                var color = material.color;
+                color.a = Highlighted
+                    ? _config.RelativeXRayOpacity * _config.SelectedPreviewsOpacity
+                    : _config.RelativeXRayOpacity * _config.PreviewsOpacity;
+                material.color = color;
 
                 if (material.shader.name != "Battlehub/RTGizmos/Handles")
                 {
@@ -197,9 +176,9 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
         XRayPreview = null;
     }
 
-    protected abstract List<GameObject> CreatePreviewPrimitives();
+    protected abstract GameObject[] CreatePreviewPrimitives();
 
-    protected abstract List<GameObject> DoCreatePreview();
+    protected abstract GameObject[] DoCreatePreview();
 
     public void SetHighlighted(bool value)
     {

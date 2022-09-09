@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IModel
 {
@@ -17,4 +18,10 @@ public class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IMode
     }
 
     public override IEnumerable<ColliderModel> GetColliders() => _ownedColliders;
+
+    public IEnumerable<Rigidbody> GetRigidbodies()
+    {
+        if (Component.jointRB != null) yield return Component.jointRB;
+        if (Component.kinematicRB != null) yield return Component.kinematicRB;
+    }
 }

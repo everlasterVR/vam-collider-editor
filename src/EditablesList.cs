@@ -64,6 +64,7 @@ public class EditablesList
             })
             .ToList();
 
+        var autoCollidersRigidBodies = new HashSet<Rigidbody>(autoColliders.SelectMany(x => x.GetRigidbodies()));
         var autoCollidersColliders = new HashSet<Collider>(autoColliders.SelectMany(x => x.GetColliders()).Select(x => x.Collider));
         var autoCollidersMap = autoColliders.ToDictionary(x => x.AutoCollider);
 
@@ -83,6 +84,23 @@ public class EditablesList
             })
             .ToList();
 
+        // Rigidbodies
+
+        var rigidbodyDuplicates = new HashSet<string>();
+        var controllerRigidbodies = new HashSet<Rigidbody>(containingAtom.freeControllers.SelectMany(fc => fc.GetComponents<Rigidbody>()));
+        var rigidbodies = containingAtom.GetComponentsInChildren<Rigidbody>(true)
+            .Where(rigidbody => !autoCollidersRigidBodies.Contains(rigidbody))
+            .Where(rigidbody => !controllerRigidbodies.Contains(rigidbody))
+            .Where(IsRigidbodyIncluded)
+            .Select(rigidbody => new RigidbodyModel(rigidbody))
+            .Where(model => rigidbodyDuplicates.Add(model.Id))
+            .ForEach(model => {
+                var matching = groups.Where(g => g.Test(model.Rigidbody.name)).ToList();
+                model.Groups.AddRange(matching.Any() ? matching : other);
+            })
+            .ToList();
+        var rigidbodiesDict = rigidbodies.ToDictionary(x => x.Id);
+
         // Colliders
 
         var colliderDuplicates = new HashSet<string>();
@@ -95,12 +113,39 @@ public class EditablesList
             .Where(model => colliderDuplicates.Add(model.Id))
             .ToList();
 
+        // Attach colliders to rigidbodies
+
+        foreach (var colliderModel in colliders)
+        {
+            if (colliderModel.Collider.attachedRigidbody != null)
+            {
+                RigidbodyModel rigidbodyModel;
+                if (rigidbodiesDict.TryGetValue(colliderModel.Collider.attachedRigidbody.Uuid(), out rigidbodyModel))
+                {
+                    rigidbodyModel.Colliders.Add(colliderModel);
+                    colliderModel.Groups = rigidbodyModel.Groups;
+                }
+                else
+                {
+                    SuperController.LogError($"Could not find a matching rigidbody for collider '{colliderModel.Id}', rigidbody '{colliderModel.Collider.attachedRigidbody.Uuid()}'.");
+                    var matching = groups.Where(g => g.Test(colliderModel.Collider.name)).ToList();
+                    colliderModel.Groups.AddRange(matching.Any() ? matching : other);
+                }
+            }
+            else
+            {
+                var matching = groups.Where(g => g.Test(colliderModel.Collider.name)).ToList();
+                colliderModel.Groups.AddRange(matching.Any() ? matching : other);
+            }
+        }
+
         // All Editables
         return new EditablesList(
             groups.Concat(other).ToList(),
             colliders,
             autoColliders,
             autoColliderGroups
+            // rigidbodies
         );
     }
 

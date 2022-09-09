@@ -138,6 +138,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
     {
         ColliderModel typed;
 
+        // ReSharper disable once MergeCastWithTypeCheck
         if (collider is SphereCollider)
             typed = new SphereColliderModel((SphereCollider)collider, config);
         else if (collider is BoxCollider)
@@ -180,7 +181,7 @@ public abstract class ColliderModel : ModelBase<Collider>, IModel
 
     protected abstract GameObject[] DoCreatePreview();
 
-    public void SetHighlighted(bool value)
+    public new void SetHighlighted(bool value)
     {
         if (Highlighted == value) return;
 

@@ -6,9 +6,9 @@ public interface IModel
     List<Group> Groups { get; }
     string Id { get; }
     string Label { get; }
-    bool Shown { get; set; }
-    bool Highlighted { get; set; }
-    bool Selected { get; set; }
+    bool Shown { set; }
+    bool Highlighted { set; }
+    bool Selected { set; }
     IModel MirrorModel { get; }
 
     void UpdatePreviewsFromConfig();

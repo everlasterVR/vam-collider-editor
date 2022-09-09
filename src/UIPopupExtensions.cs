@@ -1,8 +1,9 @@
+// ReSharper disable MemberCanBePrivate.Global
 using System.Linq;
 
 public static class UIPopupExtensions
 {
-    public const int maxVisibleCount = 400;
+    public const int MaxVisibleCount = 400;
 
     public static void SelectPrevious(this UIPopup uiPopup)
     {
@@ -29,7 +30,7 @@ public static class UIPopupExtensions
     }
 
     public static string LastVisibleValue(this UIPopup uiPopup) =>
-        uiPopup.popupValues.Length > maxVisibleCount
-            ? uiPopup.popupValues[maxVisibleCount - 1]
+        uiPopup.popupValues.Length > MaxVisibleCount
+            ? uiPopup.popupValues[MaxVisibleCount - 1]
             : uiPopup.popupValues.Last();
 }

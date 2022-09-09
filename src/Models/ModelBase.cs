@@ -6,7 +6,7 @@ public abstract class ModelBase<T> where T : Component
 {
     private bool _highlighted;
     protected readonly T Component;
-    public List<Group> Groups { get; set; }
+    public List<Group> Groups { get; }
     public ModelBase<T> Mirror { get; set; }
     public IModel MirrorModel => Mirror as IModel;
     public string Id { get; }
@@ -36,7 +36,7 @@ public abstract class ModelBase<T> where T : Component
         }
     }
 
-    public virtual void SetHighlighted(bool value)
+    protected virtual void SetHighlighted(bool value)
     {
     }
 

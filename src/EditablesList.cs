@@ -47,7 +47,7 @@ public class EditablesList
         {
             groups = new List<Group>
             {
-                new Group("All", @"^.+$"),
+                new Group("All", @"^.+$")
             };
         }
         var other = new List<Group> { new Group("Other", "") };
@@ -134,9 +134,9 @@ public class EditablesList
     }
 
     public List<Group> Groups { get; }
-    public readonly List<ColliderModel> Colliders;
-    public readonly List<AutoColliderModel> AutoColliders;
-    public readonly List<AutoColliderGroupModel> AutoColliderGroups;
+    private readonly List<ColliderModel> _colliders;
+    private readonly List<AutoColliderModel> _autoColliders;
+    private readonly List<AutoColliderGroupModel> _autoColliderGroups;
     public List<IModel> All { get; }
     public Dictionary<string, IModel> ByUuid { get; }
     private bool _readyForUI;
@@ -144,10 +144,11 @@ public class EditablesList
     private EditablesList(List<Group> groups, List<ColliderModel> colliders, List<AutoColliderModel> autoColliders, List<AutoColliderGroupModel> autoColliderGroups)
     {
         Groups = groups;
-        Colliders = colliders;
-        AutoColliders = autoColliders;
-        AutoColliderGroups = autoColliderGroups;
+        _colliders = colliders;
+        _autoColliders = autoColliders;
+        _autoColliderGroups = autoColliderGroups;
 
+        // ReSharper disable RedundantEnumerableCastCall
         All = colliders.Cast<IModel>()
             .Concat(autoColliderGroups.Cast<IModel>())
             .Concat(autoColliders.Cast<IModel>())
@@ -161,9 +162,9 @@ public class EditablesList
     {
         if (_readyForUI) return;
         _readyForUI = true;
-        MatchMirror<AutoColliderModel, AutoCollider>(AutoColliders);
-        MatchMirror<AutoColliderGroupModel, AutoColliderGroup>(AutoColliderGroups);
-        MatchMirror<ColliderModel, Collider>(Colliders);
+        MatchMirror<AutoColliderModel, AutoCollider>(_autoColliders);
+        MatchMirror<AutoColliderGroupModel, AutoColliderGroup>(_autoColliderGroups);
+        MatchMirror<ColliderModel, Collider>(_colliders);
     }
 
     private static void MatchMirror<TModel, TComponent>(List<TModel> items)
@@ -178,7 +179,7 @@ public class EditablesList
             {
                 continue;
             }
-            var rightId = Mirrors.Find(left.Id);
+            string rightId = Mirrors.Find(left.Id);
             if (rightId == null)
             {
                 continue;
@@ -189,7 +190,10 @@ public class EditablesList
                 if (left.Id.Contains("Shin")) continue;
             }
             left.Mirror = right;
-            right.Mirror = left;
+            if(right != null)
+            {
+                right.Mirror = left;
+            }
             skip.Add(right);
         }
     }

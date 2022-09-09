@@ -17,7 +17,7 @@ public static class Mirrors
         new MirrorRegexReplace { Regex = new Regex(@"(?<!a)l$", RegexOptions.Compiled), Replacement = "r" },
         new MirrorRegexReplace { Regex = new Regex(@"(?<!a)l(?=\.)", RegexOptions.Compiled), Replacement = "r" },
         new MirrorRegexReplace { Regex = new Regex(@"L$", RegexOptions.Compiled), Replacement = "R" },
-        new MirrorRegexReplace { Regex = new Regex(@"(?<!_Collider|pelvisB)L(?=[0-9A-Z\.])", RegexOptions.Compiled), Replacement = "R" },
+        new MirrorRegexReplace { Regex = new Regex(@"(?<!_Collider|pelvisB)L(?=[0-9A-Z\.])", RegexOptions.Compiled), Replacement = "R" }
     };
 
     public static string Find(string name)
@@ -90,7 +90,7 @@ public static class Mirrors
         Add(
             "abdomen.FemaleAutoCollidersabdomen.AutoColliderFemaleAutoCollidersabdomen5.AutoColliderFemaleAutoCollidersabdomen5",
             "abdomen.FemaleAutoCollidersabdomen.AutoColliderFemaleAutoCollidersabdomen6.AutoColliderFemaleAutoCollidersabdomen6");
-        for (int i = 1; i <= 5; ++i)
+        for (var i = 1; i <= 5; ++i)
         {
             Add(
                 $"abdomen.FemaleAutoCollidersabdomen.AutoColliderFemaleAutoCollidersabdomen{6+i}.AutoColliderFemaleAutoCollidersabdomen{6+i}",
@@ -104,7 +104,7 @@ public static class Mirrors
             "abdomen.FemaleAutoCollidersabdomen.AutoColliderFemaleAutoCollidersabdomen24.AutoColliderFemaleAutoCollidersabdomen24");
 
         // shin
-        for (int i = 1; i <= 16; ++i)
+        for (var i = 1; i <= 16; ++i)
         {
             Add(
                 $"lShin.FemaleAutoColliderslShin.AutoColliderFemaleAutoColliderslShin{i}.AutoColliderFemaleAutoColliderslShin{i}",

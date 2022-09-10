@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class EditablesList
+public class SelectablesList
 {
-    public static EditablesList Build(
+    public static SelectablesList Build(
         Atom containingAtom,
         ColliderPreviewConfig config,
         List<Group> customGroups
@@ -139,8 +139,7 @@ public class EditablesList
             }
         }
 
-        // All Editables
-        return new EditablesList(
+        return new SelectablesList(
             groups.Concat(other).ToList(),
             colliders,
             autoColliders,
@@ -186,7 +185,7 @@ public class EditablesList
     public Dictionary<string, IModel> ByUuid { get; }
     private bool _readyForUI;
 
-    private EditablesList(List<Group> groups, List<ColliderModel> colliders, List<AutoColliderModel> autoColliders, List<AutoColliderGroupModel> autoColliderGroups)
+    private SelectablesList(List<Group> groups, List<ColliderModel> colliders, List<AutoColliderModel> autoColliders, List<AutoColliderGroupModel> autoColliderGroups)
     {
         Groups = groups;
         _colliders = colliders;

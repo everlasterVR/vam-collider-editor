@@ -28,12 +28,12 @@ public class ColliderVisualizer : MonoBehaviour
     public JSONStorableBool HighlightMirrorJSON { get; set; }
     public JSONStorableStringChooser GroupsJSON { get; set; }
     public JSONStorableStringChooser TypesJSON { get; set; }
-    public JSONStorableStringChooser EditablesJSON { get; set; }
-    public EditablesList EditablesList { get; private set; }
+    public JSONStorableStringChooser SelectablesJSON { get; set; }
+    public SelectablesList SelectablesList { get; private set; }
     public ColliderPreviewConfig Config { get; } = new ColliderPreviewConfig();
     // ReSharper restore UnusedAutoPropertyAccessor.Global MemberCanBePrivate.Global
 
-    private List<IModel> _filteredEditables;
+    private List<IModel> _filteredSelectables;
     private IModel _selected, _selectedMirror;
 
     public void Init(
@@ -43,7 +43,7 @@ public class ColliderVisualizer : MonoBehaviour
     {
         try
         {
-            EditablesList = EditablesList.Build(script.containingAtom, Config, customGroups);
+            SelectablesList = SelectablesList.Build(script.containingAtom, Config, customGroups);
             SetupStorables();
             UpdateFilter();
         }
@@ -58,7 +58,7 @@ public class ColliderVisualizer : MonoBehaviour
         ShowPreviewsJSON = new JSONStorableBool("showPreviews", ColliderPreviewConfig.DefaultPreviewsEnabled, value =>
         {
             Config.PreviewsEnabled = value;
-            foreach(var editable in EditablesList.All) editable.UpdatePreviewsFromConfig();
+            SelectablesList.All.ForEach(model => model.UpdatePreviewsFromConfig());
         })
         {
             isStorable = false,
@@ -68,8 +68,7 @@ public class ColliderVisualizer : MonoBehaviour
         XRayPreviewsJSON = new JSONStorableBool("xRayPreviews", ColliderPreviewConfig.DefaultXRayPreviews, value =>
         {
             Config.XRayPreviews = value;
-            foreach (var editable in EditablesList.All)
-                editable.UpdatePreviewsFromConfig();
+            SelectablesList.All.ForEach(model => model.UpdatePreviewsFromConfig());
         });
 
         XRayPreviewsOffJSON = new JSONStorableBool("xRayPreviewsOff", !ColliderPreviewConfig.DefaultXRayPreviews, value =>
@@ -81,8 +80,7 @@ public class ColliderVisualizer : MonoBehaviour
         {
             float alpha = value.ExponentialScale(ColliderPreviewConfig.ExponentialScaleMiddle, 1f);
             Config.PreviewsOpacity = alpha;
-            foreach (var editable in EditablesList.All)
-                editable.UpdatePreviewsFromConfig();
+            SelectablesList.All.ForEach(model => model.UpdatePreviewsFromConfig());
         }, 0f, 1f);
 
         SelectedPreviewOpacityJSON = new JSONStorableFloat("selectedPreviewOpacity", ColliderPreviewConfig.DefaultSelectedPreviewOpacity, value =>
@@ -111,7 +109,7 @@ public class ColliderVisualizer : MonoBehaviour
         );
 
         var groups = new List<string> { _noSelectionLabel };
-        groups.AddRange(EditablesList.Groups.Select(e => e.Name).Distinct());
+        groups.AddRange(SelectablesList.Groups.Select(e => e.Name).Distinct());
         groups.Add(_allLabel);
         GroupsJSON = new JSONStorableStringChooser("Group", groups, groups[0], "Group")
         {
@@ -121,7 +119,7 @@ public class ColliderVisualizer : MonoBehaviour
         };
 
         var types = new List<string> { _noSelectionLabel };
-        types.AddRange(EditablesList.All.Select(e => e.Type).Distinct());
+        types.AddRange(SelectablesList.All.Select(e => e.Type).Distinct());
         types.Add(_allLabel);
         TypesJSON = new JSONStorableStringChooser("Type", types, types[0], "Type")
         {
@@ -130,40 +128,41 @@ public class ColliderVisualizer : MonoBehaviour
             isRestorable = false
         };
 
-        EditablesJSON = new JSONStorableStringChooser(
-            "Edit",
+        SelectablesJSON = new JSONStorableStringChooser(
+            "Select",
             new List<string>(),
             new List<string>(),
             "",
-            "Edit")
+            "Select"
+        )
         {
             isStorable = false,
             isRestorable = false
         };
 
-        EditablesJSON.setCallbackFunction = id =>
+        SelectablesJSON.setCallbackFunction = id =>
         {
             IModel val;
-            if (EditablesList.ByUuid.TryGetValue(id, out val))
-                SelectEditable(val);
+            if (SelectablesList.ByUuid.TryGetValue(id, out val))
+                SelectModel(val);
             else
-                SelectEditable(null);
+                SelectModel(null);
         };
     }
 
-    public void SelectEditable(IModel val)
+    public void SelectModel(IModel val)
     {
         Deselect(ref _selected);
         Deselect(ref _selectedMirror);
 
         if (val == null)
         {
-            EditablesJSON.valNoCallback = "";
+            SelectablesJSON.valNoCallback = "";
             return;
         }
 
-        EditablesJSON.valNoCallback = val.Id;
-        EditablesList.PrepareForUI();
+        SelectablesJSON.valNoCallback = val.Id;
+        SelectablesList.PrepareForUI();
 
         Select(ref _selected, val);
         if (Config.HighlightMirror && _selected.MirrorModel != null)
@@ -175,7 +174,7 @@ public class ColliderVisualizer : MonoBehaviour
         if (selected == null) return;
         selected.Selected = false;
         selected.Highlighted = false;
-        selected.Shown = _filteredEditables.Contains(selected);
+        selected.Shown = _filteredSelectables.Contains(selected);
         selected.UpdatePreviewsFromConfig();
         selected = null;
     }
@@ -184,7 +183,7 @@ public class ColliderVisualizer : MonoBehaviour
     private void Select(ref IModel selected, IModel val, bool shown = true, bool highlighted = true, bool showUI = true)
     {
         selected = val;
-        selected.Shown = shown || _filteredEditables.Contains(selected);
+        selected.Shown = shown || _filteredSelectables.Contains(selected);
         selected.Highlighted = highlighted;
         selected.Selected = showUI;
         selected.UpdatePreviewsFromConfig();
@@ -194,9 +193,9 @@ public class ColliderVisualizer : MonoBehaviour
     {
         try
         {
-            HideCurrentFilteredEditables();
+            HideCurrentFilteredSelectables();
 
-            var filtered = EditablesList.All;
+            var filtered = SelectablesList.All;
 
             if (GroupsJSON.val != _allLabel && GroupsJSON.val != _noSelectionLabel)
                 filtered = filtered.Where(e => e.Groups.Any(group => group?.Name == GroupsJSON.val)).ToList();
@@ -204,19 +203,19 @@ public class ColliderVisualizer : MonoBehaviour
             if (TypesJSON.val != _allLabel && TypesJSON.val != _noSelectionLabel)
                 filtered = filtered.Where(e => e.Type == TypesJSON.val).ToList();
 
-            _filteredEditables = filtered;
-            EditablesJSON.choices = _filteredEditables.Select(x => x.Id).ToList();
-            EditablesJSON.displayChoices = _filteredEditables.Select(x => x.Label).ToList();
+            _filteredSelectables = filtered;
+            SelectablesJSON.choices = _filteredSelectables.Select(x => x.Id).ToList();
+            SelectablesJSON.displayChoices = _filteredSelectables.Select(x => x.Label).ToList();
 
-            SelectEditable(_selected);
-            foreach (var e in _filteredEditables)
+            SelectModel(_selected);
+            foreach (var model in _filteredSelectables)
             {
-                e.Shown = true;
-                e.UpdatePreviewsFromConfig();
+                model.Shown = true;
+                model.UpdatePreviewsFromConfig();
             }
 
-            if (!EditablesJSON.choices.Contains(EditablesJSON.val) || string.IsNullOrEmpty(EditablesJSON.val))
-                EditablesJSON.val = EditablesJSON.choices.FirstOrDefault() ?? "";
+            if (!SelectablesJSON.choices.Contains(SelectablesJSON.val) || string.IsNullOrEmpty(SelectablesJSON.val))
+                SelectablesJSON.val = SelectablesJSON.choices.FirstOrDefault() ?? "";
         }
         catch (Exception e)
         {
@@ -224,24 +223,21 @@ public class ColliderVisualizer : MonoBehaviour
         }
     }
 
-    private void HideCurrentFilteredEditables()
+    private void HideCurrentFilteredSelectables()
     {
-        var previous = EditablesJSON.choices.Where(x => EditablesList.ByUuid.ContainsKey(x)).Select(x => EditablesList.ByUuid[x]);
-        foreach (var e in previous)
+        var previous = SelectablesJSON.choices.Where(x => SelectablesList.ByUuid.ContainsKey(x)).Select(x => SelectablesList.ByUuid[x]);
+        foreach (var model in previous)
         {
-            e.Shown = false;
-            e.UpdatePreviewsFromConfig();
+            model.Shown = false;
+            model.UpdatePreviewsFromConfig();
         }
     }
 
     public void DestroyAllPreviews()
     {
-        if(EditablesList?.All != null)
+        if(SelectablesList?.All != null)
         {
-            foreach (var editable in EditablesList.All)
-            {
-                editable.DestroyPreviews();
-            }
+            SelectablesList.All.ForEach(model => model.DestroyPreviews());
         }
     }
 
@@ -249,13 +245,10 @@ public class ColliderVisualizer : MonoBehaviour
 
     public void OnEnable()
     {
-        if (EditablesList?.All == null || ShowPreviewsJSON == null) return;
+        if (SelectablesList?.All == null || ShowPreviewsJSON == null) return;
         try
         {
-            foreach (var editable in EditablesList.All)
-            {
-                editable.UpdatePreviewsFromConfig();
-            }
+            SelectablesList.All.ForEach(model => model.UpdatePreviewsFromConfig());
         }
         catch (Exception e)
         {
@@ -279,9 +272,9 @@ public class ColliderVisualizer : MonoBehaviour
 
     public void SyncPreviews()
     {
-        if(EditablesList != null && ShowPreviewsJSON != null && ShowPreviewsJSON.val)
+        if(SelectablesList != null && ShowPreviewsJSON != null && ShowPreviewsJSON.val)
         {
-            EditablesList.All.ForEach(editable => editable.SyncPreviews());
+            SelectablesList.All.ForEach(model => model.SyncPreviews());
         }
     }
 

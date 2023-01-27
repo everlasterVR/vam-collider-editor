@@ -207,15 +207,15 @@ public class ColliderVisualizer : MonoBehaviour
             SelectablesJSON.choices = _filteredSelectables.Select(x => x.Id).ToList();
             SelectablesJSON.displayChoices = _filteredSelectables.Select(x => x.Label).ToList();
 
-            SelectModel(_selected);
+            // SelectModel(_selected);
             foreach (var model in _filteredSelectables)
             {
                 model.Shown = true;
                 model.UpdatePreviewsFromConfig();
             }
 
-            if (!SelectablesJSON.choices.Contains(SelectablesJSON.val) || string.IsNullOrEmpty(SelectablesJSON.val))
-                SelectablesJSON.val = SelectablesJSON.choices.FirstOrDefault() ?? "";
+            // if (!SelectablesJSON.choices.Contains(SelectablesJSON.val) || string.IsNullOrEmpty(SelectablesJSON.val))
+            //     SelectablesJSON.val = SelectablesJSON.choices.FirstOrDefault() ?? "";
         }
         catch (Exception e)
         {

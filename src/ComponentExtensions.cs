@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class ComponentExtensions
+public static partial class ComponentExtensions
 {
     public static string Uuid(this Component component)
     {

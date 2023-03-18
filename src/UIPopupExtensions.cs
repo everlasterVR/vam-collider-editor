@@ -1,7 +1,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 using System.Linq;
 
-public static class UIPopupExtensions
+public static partial class UIPopupExtensions
 {
     public const int MaxVisibleCount = 400;
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public static class MVRScriptExtensions
+public static partial class MVRScriptExtensions
 {
     public static UIDynamicPopup CreatePopupAuto(
         this MVRScript script,

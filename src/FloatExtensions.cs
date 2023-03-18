@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class FloatExtensions
+public static partial class FloatExtensions
 {
     public static float ExponentialScale(this float inputValue, float midValue, float maxValue)
     {

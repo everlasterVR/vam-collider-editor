@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public static class EnumerableExtensions
+public static partial class EnumerableExtensions
 {
     public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> fn)
     {

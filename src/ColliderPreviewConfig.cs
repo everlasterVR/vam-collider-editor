@@ -1,20 +1,25 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-public class ColliderPreviewConfig
+using ColliderEditor.Extensions;
+
+namespace ColliderEditor
 {
-    public const float ExponentialScaleMiddle = 0.1f;
+    public class ColliderPreviewConfig
+    {
+        public const float EXPONENTIAL_SCALE_MIDDLE = 0.1f;
 
-    public const bool DefaultPreviewsEnabled = false;
-    public const bool DefaultXRayPreviews = true;
-    public const float DefaultPreviewsOpacity = 0.5f;
-    public const float DefaultSelectedPreviewOpacity = 1.0f;
-    public const float DefaultRelativeXRayOpacity = 0.5f;
-    public const bool DefaultHighlightMirror = false;
+        public const bool DEFAULT_PREVIEWS_ENABLED = false;
+        public const bool DEFAULT_X_RAY_PREVIEWS = true;
+        public const float DEFAULT_PREVIEWS_OPACITY = 0.5f;
+        public const float DEFAULT_SELECTED_PREVIEW_OPACITY = 1.0f;
+        public const float DEFAULT_RELATIVE_X_RAY_OPACITY = 0.5f;
+        public const bool DEFAULT_HIGHLIGHT_MIRROR = false;
 
-    public bool PreviewsEnabled { get; set; } = DefaultPreviewsEnabled;
-    public bool XRayPreviews { get; set; } = DefaultXRayPreviews;
-    public bool HighlightMirror { get; set; } = DefaultHighlightMirror;
-    public float PreviewsOpacity { get; set; } = DefaultPreviewsOpacity.ExponentialScale(ExponentialScaleMiddle, 1f);
-    public float SelectedPreviewsOpacity { get; set; } = DefaultSelectedPreviewOpacity.ExponentialScale(ExponentialScaleMiddle, 1f);
-    public float RelativeXRayOpacity { get; set; } = DefaultRelativeXRayOpacity;
+        public bool PreviewsEnabled { get; set; } = DEFAULT_PREVIEWS_ENABLED;
+        public bool XRayPreviews { get; set; } = DEFAULT_X_RAY_PREVIEWS;
+        public bool HighlightMirror { get; set; } = DEFAULT_HIGHLIGHT_MIRROR;
+        public float PreviewsOpacity { get; set; } = DEFAULT_PREVIEWS_OPACITY.ExponentialScale(EXPONENTIAL_SCALE_MIDDLE, 1f);
+        public float SelectedPreviewsOpacity { get; set; } = DEFAULT_SELECTED_PREVIEW_OPACITY.ExponentialScale(EXPONENTIAL_SCALE_MIDDLE, 1f);
+        public float RelativeXRayOpacity { get; set; } = DEFAULT_RELATIVE_X_RAY_OPACITY;
+    }
 }

@@ -1,27 +1,57 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IModel
+namespace ColliderEditor.Models
 {
-    private readonly List<ColliderModel> _ownedColliders = new List<ColliderModel>();
-
-    protected override bool OwnsColliders => true;
-
-    public string Type => "Auto Collider";
-    public AutoCollider AutoCollider => Component;
-
-    public AutoColliderModel(AutoCollider autoCollider, ColliderPreviewConfig config)
-        : base(autoCollider, $"[au] {NameHelper.Simplify(autoCollider.name)}")
+    public class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IModel
     {
-        if (Component.hardCollider != null) _ownedColliders.Add(ColliderModel.CreateTyped(autoCollider.hardCollider, config));
-        if (Component.jointCollider != null) _ownedColliders.Add(ColliderModel.CreateTyped(Component.jointCollider, config));
-    }
+        readonly List<ColliderModel> _ownedColliders = new List<ColliderModel>();
 
-    public override IEnumerable<ColliderModel> GetColliders() => _ownedColliders;
+        protected override bool OwnsColliders
+        {
+            get { return true; }
+        }
 
-    public IEnumerable<Rigidbody> GetRigidbodies()
-    {
-        if (Component.jointRB != null) yield return Component.jointRB;
-        if (Component.kinematicRB != null) yield return Component.kinematicRB;
+        public string Type
+        {
+            get { return "Auto Collider"; }
+        }
+
+        public AutoCollider AutoCollider
+        {
+            get { return component; }
+        }
+
+        public AutoColliderModel(AutoCollider autoCollider, ColliderPreviewConfig config)
+            : base(autoCollider, $"[au] {NameHelper.Simplify(autoCollider.name)}")
+        {
+            if(component.hardCollider != null)
+            {
+                _ownedColliders.Add(ColliderModel.CreateTyped(autoCollider.hardCollider, config));
+            }
+
+            if(component.jointCollider != null)
+            {
+                _ownedColliders.Add(ColliderModel.CreateTyped(component.jointCollider, config));
+            }
+        }
+
+        public override IEnumerable<ColliderModel> GetColliders()
+        {
+            return _ownedColliders;
+        }
+
+        public IEnumerable<Rigidbody> GetRigidbodies()
+        {
+            if(component.jointRB != null)
+            {
+                yield return component.jointRB;
+            }
+
+            if(component.kinematicRB != null)
+            {
+                yield return component.kinematicRB;
+            }
+        }
     }
 }

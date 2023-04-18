@@ -1,20 +1,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class AutoColliderGroupModel : ColliderContainerModelBase<AutoColliderGroup>, IModel
+namespace ColliderEditor.Models
 {
-    private readonly List<AutoColliderModel> _autoColliders;
-
-    protected override bool OwnsColliders => true;
-
-    public string Type => "Auto Collider Group";
-    public AutoColliderGroup AutoColliderGroup => Component;
-
-    public AutoColliderGroupModel(AutoColliderGroup autoColliderGroup, List<AutoColliderModel> autoColliders)
-        : base(autoColliderGroup, $"[ag] {NameHelper.Simplify(autoColliderGroup.name)}")
+    public class AutoColliderGroupModel : ColliderContainerModelBase<AutoColliderGroup>, IModel
     {
-        _autoColliders = autoColliders;
-    }
+        readonly List<AutoColliderModel> _autoColliders;
 
-    public override IEnumerable<ColliderModel> GetColliders() => _autoColliders.SelectMany(ac => ac.GetColliders());
+        protected override bool OwnsColliders
+        {
+            get { return true; }
+        }
+
+        public string Type
+        {
+            get { return "Auto Collider Group"; }
+        }
+
+        public AutoColliderGroup AutoColliderGroup
+        {
+            get { return component; }
+        }
+
+        public AutoColliderGroupModel(AutoColliderGroup autoColliderGroup, List<AutoColliderModel> autoColliders)
+            : base(autoColliderGroup, $"[ag] {NameHelper.Simplify(autoColliderGroup.name)}")
+        {
+            _autoColliders = autoColliders;
+        }
+
+        public override IEnumerable<ColliderModel> GetColliders()
+        {
+            return _autoColliders.SelectMany(ac => ac.GetColliders());
+        }
+    }
 }

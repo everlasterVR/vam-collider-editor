@@ -1,18 +1,21 @@
 using System.Text.RegularExpressions;
 
-public class Group
+namespace ColliderEditor
 {
-    public string Name { get; }
-    private Regex Pattern { get; }
-
-    public Group(string name, string pattern)
+    public class Group
     {
-        Name = name;
-        Pattern = new Regex(pattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-    }
+        public string Name { get; }
+        Regex Pattern { get; }
 
-    public bool Test(string name)
-    {
-        return Pattern.IsMatch(name);
+        public Group(string name, string pattern)
+        {
+            Name = name;
+            Pattern = new Regex(pattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        }
+
+        public bool Test(string name)
+        {
+            return Pattern.IsMatch(name);
+        }
     }
 }

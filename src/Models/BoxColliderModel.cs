@@ -1,29 +1,38 @@
 using System.Linq;
 using UnityEngine;
 
-public class BoxColliderModel : ColliderModel<BoxCollider>
+namespace ColliderEditor.Models
 {
-    public BoxColliderModel(BoxCollider collider, ColliderPreviewConfig config)
-        : base(collider, config)
+    public class BoxColliderModel : ColliderModel<BoxCollider>
     {
-    }
+        public BoxColliderModel(BoxCollider collider, ColliderPreviewConfig config)
+            : base(collider, config)
+        {
+        }
 
-    protected override GameObject[] DoCreatePreview() => new[]
-    {
-        GameObject.CreatePrimitive(PrimitiveType.Cube)
-    };
+        protected override GameObject[] DoCreatePreview()
+        {
+            return new[]
+            {
+                GameObject.CreatePrimitive(PrimitiveType.Cube),
+            };
+        }
 
-    public override void SyncPreviews()
-    {
-        SyncPreview(Preview?.First());
-        SyncPreview(XRayPreview?.First());
-    }
+        public override void SyncPreviews()
+        {
+            SyncPreview(Preview?.First());
+            SyncPreview(XRayPreview?.First());
+        }
 
-    private void SyncPreview(GameObject preview)
-    {
-        if (preview == null) return;
+        void SyncPreview(GameObject preview)
+        {
+            if(preview == null)
+            {
+                return;
+            }
 
-        preview.transform.localScale = Collider.size;
-        preview.transform.localPosition = Collider.center;
+            preview.transform.localScale = Collider.size;
+            preview.transform.localPosition = Collider.center;
+        }
     }
 }

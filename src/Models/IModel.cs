@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 
-public interface IModel
+namespace ColliderEditor.Models
 {
-    string Type { get; }
-    List<Group> Groups { get; }
-    string Id { get; }
-    string Label { get; }
-    bool Shown { set; }
-    bool Highlighted { set; }
-    bool Selected { set; }
-    IModel MirrorModel { get; }
+    public interface IModel
+    {
+        string Type { get; }
+        List<Group> Groups { get; }
+        string Id { get; }
+        string Label { get; }
+        bool Shown { set; }
+        bool Highlighted { set; }
+        bool Selected { set; }
+        IModel MirrorModel { get; }
 
-    void UpdatePreviewsFromConfig();
-    void SyncPreviews();
-    void DestroyPreviews();
+        void UpdatePreviewsFromConfig();
+        void SyncPreviews();
+        void DestroyPreviews();
+    }
 }

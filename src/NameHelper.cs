@@ -1,17 +1,30 @@
-public static class NameHelper
+namespace ColliderEditor
 {
-    public static string Simplify(string label)
+    public static class NameHelper
     {
-        if (label.StartsWith("AutoColliderAutoColliders"))
-            return label.Substring("AutoColliderAutoColliders".Length);
-        if (label.StartsWith("AutoColliderFemaleAutoColliders"))
-            return label.Substring("AutoColliderFemaleAutoColliders".Length);
-        if (label.StartsWith("AutoCollider"))
-            return label.Substring("AutoCollider".Length);
-        if (label.StartsWith("FemaleAutoColliders"))
-            return label.Substring("FemaleAutoColliders".Length);
-        if (label.StartsWith("_"))
-            return label.Substring(1);
-        return label;
+        public static string Simplify(string label)
+        {
+            if(label.StartsWith("AutoColliderAutoColliders"))
+            {
+                return label.Substring("AutoColliderAutoColliders".Length);
+            }
+
+            if(label.StartsWith("AutoColliderFemaleAutoColliders"))
+            {
+                return label.Substring("AutoColliderFemaleAutoColliders".Length);
+            }
+
+            if(label.StartsWith("AutoCollider"))
+            {
+                return label.Substring("AutoCollider".Length);
+            }
+
+            if(label.StartsWith("FemaleAutoColliders"))
+            {
+                return label.Substring("FemaleAutoColliders".Length);
+            }
+
+            return label.StartsWith("_") ? label.Substring(1) : label;
+        }
     }
 }

@@ -1,60 +1,73 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Component
+namespace ColliderEditor.Models
 {
-    private bool _shown;
-
-    protected abstract bool OwnsColliders { get; }
-    public bool Shown
+    public abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Component
     {
-        get
+        protected abstract bool OwnsColliders { get; }
+
+        public bool Shown
         {
-            return _shown;
-        }
-        set
-        {
-            _shown = value;
-            if (OwnsColliders)
+            set
             {
-                foreach (var c in GetColliders())
+                if(OwnsColliders)
                 {
-                    c.Shown = value;
+                    foreach(var c in GetColliders())
+                    {
+                        c.Shown = value;
+                    }
                 }
             }
         }
-    }
 
-    protected ColliderContainerModelBase(T component, string label)
-        : base(component, label)
-    {
-    }
+        protected ColliderContainerModelBase(T component, string label)
+            : base(component, label)
+        {
+        }
 
-    protected override void SetHighlighted(bool value)
-    {
-        foreach (var collider in GetColliders())
-            collider.SetHighlighted(value);
-    }
+        protected override void SetHighlighted(bool value)
+        {
+            foreach(var collider in GetColliders())
+            {
+                collider.SetHighlighted(value);
+            }
+        }
 
-    public override void SyncPreviews()
-    {
-        if (!OwnsColliders) return;
-        foreach (var colliderModel in GetColliders())
-            colliderModel.SyncPreviews();
-    }
+        public override void SyncPreviews()
+        {
+            if(!OwnsColliders)
+            {
+                return;
+            }
 
-    public virtual void UpdatePreviewsFromConfig()
-    {
-        if (!OwnsColliders) return;
-        foreach (var colliderModel in GetColliders())
-            colliderModel.UpdatePreviewsFromConfig();
-    }
+            foreach(var colliderModel in GetColliders())
+            {
+                colliderModel.SyncPreviews();
+            }
+        }
 
-    public void DestroyPreviews()
-    {
-        foreach (var colliderModel in GetColliders())
-            colliderModel.DestroyPreviews();
-    }
+        public virtual void UpdatePreviewsFromConfig()
+        {
+            if(!OwnsColliders)
+            {
+                return;
+            }
 
-    public abstract IEnumerable<ColliderModel> GetColliders();
+            foreach(var colliderModel in GetColliders())
+            {
+                colliderModel.UpdatePreviewsFromConfig();
+            }
+        }
+
+        public void DestroyPreviews()
+        {
+            foreach(var colliderModel in GetColliders())
+            {
+                colliderModel.DestroyPreviews();
+            }
+        }
+
+        public abstract IEnumerable<ColliderModel> GetColliders();
+    }
 }

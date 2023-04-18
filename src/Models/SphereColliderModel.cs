@@ -1,29 +1,38 @@
 using System.Linq;
 using UnityEngine;
 
-public class SphereColliderModel : ColliderModel<SphereCollider>
+namespace ColliderEditor.Models
 {
-    public SphereColliderModel(SphereCollider collider, ColliderPreviewConfig config)
-        : base(collider, config)
+    public class SphereColliderModel : ColliderModel<SphereCollider>
     {
-    }
+        public SphereColliderModel(SphereCollider collider, ColliderPreviewConfig config)
+            : base(collider, config)
+        {
+        }
 
-    protected override GameObject[] DoCreatePreview() => new []
-    {
-        GameObject.CreatePrimitive(PrimitiveType.Sphere)
-    };
+        protected override GameObject[] DoCreatePreview()
+        {
+            return new[]
+            {
+                GameObject.CreatePrimitive(PrimitiveType.Sphere),
+            };
+        }
 
-    public override void SyncPreviews()
-    {
-        SyncPreview(Preview?.First());
-        SyncPreview(XRayPreview?.First());
-    }
+        public override void SyncPreviews()
+        {
+            SyncPreview(Preview?.First());
+            SyncPreview(XRayPreview?.First());
+        }
 
-    private void SyncPreview(GameObject preview)
-    {
-        if (preview == null) return;
+        void SyncPreview(GameObject preview)
+        {
+            if(preview == null)
+            {
+                return;
+            }
 
-        preview.transform.localScale = Vector3.one * (Collider.radius * 2);
-        preview.transform.localPosition = Collider.center;
+            preview.transform.localScale = Vector3.one * (Collider.radius * 2);
+            preview.transform.localPosition = Collider.center;
+        }
     }
 }

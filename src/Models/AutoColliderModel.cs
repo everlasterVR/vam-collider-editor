@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IModel
+    sealed class AutoColliderModel : ColliderContainerModelBase<AutoCollider>, IModel
     {
         readonly List<ColliderModel> _ownedColliders = new List<ColliderModel>();
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public class BoxColliderModel : ColliderModel<BoxCollider>
+    sealed class BoxColliderModel : ColliderModel<BoxCollider>
     {
         public BoxColliderModel(BoxCollider collider, ColliderPreviewConfig config)
             : base(collider, config)

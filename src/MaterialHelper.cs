@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ColliderEditor
 {
-    public static class MaterialHelper
+    static class MaterialHelper
     {
         static List<Material> _materials = new[]
             {

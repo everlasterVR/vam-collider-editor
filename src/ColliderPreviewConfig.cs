@@ -4,7 +4,7 @@ using ColliderEditor.Extensions;
 
 namespace ColliderEditor
 {
-    public class ColliderPreviewConfig
+    sealed class ColliderPreviewConfig
     {
         public const float EXPONENTIAL_SCALE_MIDDLE = 0.1f;
 

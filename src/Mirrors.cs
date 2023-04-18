@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace ColliderEditor
 {
-    public class MirrorRegexReplace
+    sealed class MirrorRegexReplace
     {
         public Regex regex;
         public string replacement;
     }
 
-    public static class Mirrors
+    static class Mirrors
     {
         public static MirrorRegexReplace[] GetMirrorRegexes()
         {

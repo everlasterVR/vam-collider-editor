@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ColliderEditor.Models
 {
-    public class AutoColliderGroupModel : ColliderContainerModelBase<AutoColliderGroup>, IModel
+    sealed class AutoColliderGroupModel : ColliderContainerModelBase<AutoColliderGroup>, IModel
     {
         readonly List<AutoColliderModel> _autoColliders;
 

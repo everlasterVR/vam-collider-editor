@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Component
+    abstract class ColliderContainerModelBase<T> : ModelBase<T> where T : Component
     {
         protected abstract bool OwnsColliders { get; }
 

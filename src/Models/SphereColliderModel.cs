@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public class SphereColliderModel : ColliderModel<SphereCollider>
+    sealed class SphereColliderModel : ColliderModel<SphereCollider>
     {
         public SphereColliderModel(SphereCollider collider, ColliderPreviewConfig config)
             : base(collider, config)

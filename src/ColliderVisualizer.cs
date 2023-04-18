@@ -5,19 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Collider Visualizer
-/// Source: https://github.com/everlasterVR/vam-collider-editor/tree/visualizer
-/// Based on:
-///
-/// Collider Editor
-/// By Acidbubbles, ProjectCanyon and via5
-/// Configures and customizes collisions (rigidbodies and colliders)
-/// Source: https://github.com/acidbubbles/vam-collider-editor
-/// </summary>
 namespace ColliderEditor
 {
-    public class ColliderVisualizer : MonoBehaviour
+    /// <summary>
+    /// Collider Visualizer
+    /// Source: https://github.com/everlasterVR/vam-collider-editor/tree/visualizer
+    /// Based on:
+    ///
+    /// Collider Editor
+    /// By Acidbubbles, ProjectCanyon and via5
+    /// Configures and customizes collisions (rigidbodies and colliders)
+    /// Source: https://github.com/acidbubbles/vam-collider-editor
+    /// </summary>
+    sealed class ColliderVisualizer : MonoBehaviour
     {
         const string NO_SELECTION_LABEL = "Select...";
         const string ALL_LABEL = "All";

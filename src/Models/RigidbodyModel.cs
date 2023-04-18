@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public class RigidbodyModel : ColliderContainerModelBase<Rigidbody>, IModel
+    sealed class RigidbodyModel : ColliderContainerModelBase<Rigidbody>, IModel
     {
         protected override bool OwnsColliders
         {

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public abstract class ModelBase<T> where T : Component
+    abstract class ModelBase<T> where T : Component
     {
         bool _highlighted;
         protected readonly T component;

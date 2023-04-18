@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace ColliderEditor.Models
 {
-    public interface IModel
+    interface IModel
     {
         string Type { get; }
         List<Group> Groups { get; }

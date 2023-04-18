@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace ColliderEditor.Models
 {
-    public abstract class ColliderModel<T> : ColliderModel where T : Collider
+    abstract class ColliderModel<T> : ColliderModel where T : Collider
     {
         new protected T Collider { get; }
 
@@ -34,7 +34,7 @@ namespace ColliderEditor.Models
         }
     }
 
-    public abstract class ColliderModel : ModelBase<Collider>, IModel
+    abstract class ColliderModel : ModelBase<Collider>, IModel
     {
         readonly ColliderPreviewConfig _config;
 

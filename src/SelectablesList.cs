@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ColliderEditor
 {
-    public class SelectablesList
+    sealed class SelectablesList
     {
         public static SelectablesList Build(
             Atom containingAtom,

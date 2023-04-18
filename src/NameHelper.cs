@@ -1,6 +1,6 @@
 namespace ColliderEditor
 {
-    public static class NameHelper
+    static class NameHelper
     {
         public static string Simplify(string label)
         {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Models
 {
-    public class CapsuleColliderModel : ColliderModel<CapsuleCollider>
+    sealed class CapsuleColliderModel : ColliderModel<CapsuleCollider>
     {
         public CapsuleColliderModel(CapsuleCollider collider, ColliderPreviewConfig config)
             : base(collider, config)

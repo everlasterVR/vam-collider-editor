@@ -8,7 +8,7 @@ namespace ColliderEditor
 {
     public static class MaterialHelper
     {
-        readonly static List<Material> _materials = new[]
+        static List<Material> _materials = new[]
             {
                 "#800000",
                 "#8B0000",
@@ -143,6 +143,11 @@ namespace ColliderEditor
             material.SetFloat("_Offset", 1f);
             material.SetFloat("_MinAlpha", 1f);
             return material;
+        }
+
+        public static void Destroy()
+        {
+            _materials = null;
         }
     }
 }

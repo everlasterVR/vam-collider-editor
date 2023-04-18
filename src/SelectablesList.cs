@@ -208,12 +208,7 @@ namespace ColliderEditor
                 return false;
             }
 
-            if(collider is MeshCollider)
-            {
-                return false;
-            }
-
-            return true;
+            return !(collider is MeshCollider);
         }
 
         static bool IsRigidbodyIncluded(Rigidbody rigidbody)
@@ -258,18 +253,14 @@ namespace ColliderEditor
                 return false;
             }
 
-            if(rigidbody.name.Contains("Ponytail"))
-            {
-                return false;
-            }
-
-            return true;
+            return !rigidbody.name.Contains("Ponytail");
         }
 
         public List<Group> Groups { get; }
         readonly List<ColliderModel> _colliders;
         readonly List<AutoColliderModel> _autoColliders;
         readonly List<AutoColliderGroupModel> _autoColliderGroups;
+        readonly MirrorRegexReplace[] _mirrorRegexes;
         public List<IModel> All { get; }
         public Dictionary<string, IModel> ByUuid { get; }
         bool _readyForUI;
@@ -282,6 +273,7 @@ namespace ColliderEditor
             _colliders = colliders;
             _autoColliders = autoColliders;
             _autoColliderGroups = autoColliderGroups;
+            _mirrorRegexes = Mirrors.GetMirrorRegexes();
 
             // ReSharper disable RedundantEnumerableCastCall
             All = colliders.Cast<IModel>()
@@ -306,7 +298,7 @@ namespace ColliderEditor
             MatchMirror<ColliderModel, Collider>(_colliders);
         }
 
-        static void MatchMirror<TModel, TComponent>(List<TModel> items)
+        void MatchMirror<TModel, TComponent>(List<TModel> items)
             where TModel : ModelBase<TComponent>
             where TComponent : Component
         {
@@ -319,7 +311,7 @@ namespace ColliderEditor
                     continue;
                 }
 
-                string rightId = Mirrors.Find(left.Id);
+                string rightId = FindMirror(left.Id);
                 if(rightId == null)
                 {
                     continue;
@@ -342,6 +334,25 @@ namespace ColliderEditor
 
                 skip.Add(right);
             }
+        }
+
+        string FindMirror(string name)
+        {
+            bool matched = false;
+            string m = name;
+
+            foreach(var r in _mirrorRegexes)
+            {
+                if(!r.regex.IsMatch(m))
+                {
+                    continue;
+                }
+
+                m = r.regex.Replace(m, r.replacement);
+                matched = true;
+            }
+
+            return matched ? m : null;
         }
     }
 }

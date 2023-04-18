@@ -298,6 +298,11 @@ namespace ColliderEditor
             }
         }
 
+        void OnDestroy()
+        {
+            MaterialHelper.Destroy();
+        }
+
         public void SyncPreviews()
         {
             if(SelectablesList != null && ShowPreviewsJSON != null && ShowPreviewsJSON.val)

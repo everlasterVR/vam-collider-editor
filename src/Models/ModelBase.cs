@@ -19,6 +19,7 @@ namespace ColliderEditor.Models
 
         public string Id { get; }
         public string Label { get; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public bool Selected { get; set; }
 
         protected ModelBase(T component, string label)

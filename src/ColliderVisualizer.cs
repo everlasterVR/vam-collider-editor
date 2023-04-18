@@ -152,19 +152,11 @@ namespace ColliderEditor
             {
                 isStorable = false,
                 isRestorable = false,
-            };
-
-            SelectablesJSON.setCallbackFunction = id =>
-            {
-                IModel val;
-                if(SelectablesList.ByUuid.TryGetValue(id, out val))
+                setCallbackFunction = id =>
                 {
-                    SelectModel(val);
-                }
-                else
-                {
-                    SelectModel(null);
-                }
+                    IModel val;
+                    SelectModel(SelectablesList.ByUuid.TryGetValue(id, out val) ? val : null);
+                },
             };
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Extensions
 {
-    public static class ComponentExtensions
+    static class ComponentExtensions
     {
         public static string Uuid(this Component component)
         {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Extensions
 {
-    public static class FloatExtensions
+    static class FloatExtensions
     {
         public static float ExponentialScale(this float inputValue, float midValue, float maxValue)
         {

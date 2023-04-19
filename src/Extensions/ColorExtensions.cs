@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ColliderEditor.Extensions
 {
-    public static class ColorExtensions
+    static class ColorExtensions
     {
         public static Color ToColor(this string value)
         {

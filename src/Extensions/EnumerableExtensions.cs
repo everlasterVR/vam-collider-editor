@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ColliderEditor.Extensions
 {
-    public static class EnumerableExtensions
+    static class EnumerableExtensions
     {
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> enumerable, Action<T> fn)
         {

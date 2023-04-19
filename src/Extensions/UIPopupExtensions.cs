@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ColliderEditor.Extensions
 {
-    public static partial class UIPopupExtensions
+    static class UIPopupExtensions
     {
         public const int MAX_VISIBLE_COUNT = 400;
 

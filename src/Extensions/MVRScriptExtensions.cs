@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace ColliderEditor.Extensions
 {
-    public static class MVRScriptExtensions
+    static class MVRScriptExtensions
     {
         public static UIDynamicPopup CreatePopupAuto(
             this MVRScript script,
